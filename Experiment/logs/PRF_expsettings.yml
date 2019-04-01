@@ -1,0 +1,55 @@
+PRF stimulus settings:
+    Bar orientations:
+    - 0
+    - 45
+    - -1
+    - 225
+    - 270
+    - -1
+    - 315
+    - 180
+    - -1
+    - 135
+    - 90
+    - -1
+    - -1
+    Bar pass duration in TRs: 20
+    Bar width in degrees: 1.25
+    Checkers motion speed: 4
+    Size fixation dot in degrees: 0.4
+    Squares in bar: 2
+eyetracker:
+    model: eyelink
+monitor:
+    distance: 250
+    gamma: 1
+    name: default
+    width: 70
+mouse:
+    visible: false
+mri:
+    TA: 2.0
+    TR: 1.5
+    simulate: false
+    skip: 0
+    sound: false
+    sync: t
+    volumes: 10
+preferences:
+    general:
+        audioLib: SoundDevice
+        units: deg
+window:
+    color:
+    - 0
+    - 0
+    - 0
+    fullscr: true
+    pos:
+    - 0
+    - 0
+    size:
+    - 1680
+    - 1050
+    waitBlanking: true
+    winType: pyglet
