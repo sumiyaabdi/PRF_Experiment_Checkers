@@ -30,8 +30,7 @@ class PRFSession(Session):
         self.create_trials()
         
         #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
-        if self.settings['mri']['scanning']==True:
-        
+        if self.settings['mri']['simulate']==False and self.settings['PRF stimulus settings']['scanner sync']==True:
             self.mri_trigger='t'
         
 
@@ -131,8 +130,8 @@ class PRFSession(Session):
 
 
         #times for dot color change
-        #with this basic implementation, the dot will changes colour approximately once every two TRs       
         self.total_time = self.settings['PRF stimulus settings']['Bar pass duration in TRs']*self.settings['mri']['TR']*len(self.settings['PRF stimulus settings']['Bar orientations'])
+        #with this basic implementation, the dot will changes colour on average once every two TRs       
         self.dot_switch_color_times = np.sort(self.total_time*np.random.rand(int(self.trial_number/2))) 
         self.current_dot_time=0
         self.next_dot_time=1
@@ -142,8 +141,9 @@ class PRFSession(Session):
 
     def draw_stimulus(self):
         #this timing is only used for the motion of checkerboards inside the bar. it does not have any effect on the actual bar motion
-        present_time = self.clock.getTime() - self.current_trial_start_time
-        prf_time = present_time #/ (self.settings['mri']['TR'])
+        present_time = self.clock.getTime() - self.exp_start
+        present_trial_time = self.clock.getTime() - self.current_trial_start_time
+        prf_time = present_trial_time / (self.settings['mri']['TR'])
   
         #draw the bar at the required orientation for this TR, unless the orientation is -1, code for a blank period
         if self.current_trial.bar_orientation != -1:
@@ -153,7 +153,7 @@ class PRFSession(Session):
                                bar_direction=self.current_trial.bar_direction)
             
             
-        #draw the correct dot color
+        #hacky way to draw the correct dot color. could be improved
         if self.next_dot_time<len(self.dot_switch_color_times):
             if present_time<self.dot_switch_color_times[self.current_dot_time]:                
                 self.fixation_disk_1.draw()
