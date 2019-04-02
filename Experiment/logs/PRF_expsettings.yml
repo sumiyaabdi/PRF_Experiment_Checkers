@@ -13,11 +13,11 @@ PRF stimulus settings:
     - 90
     - -1
     - -1
-    Bar pass duration in TRs: 20
-    Bar width in degrees: 1.25
+    Bar pass duration in TRs: 10
+    Bar width in degrees: 2.5
     Checkers motion speed: 4
     Size fixation dot in degrees: 0.4
-    Squares in bar: 2
+    Squares in bar: 4
 eyetracker:
     model: eyelink
 monitor:
@@ -28,13 +28,14 @@ monitor:
 mouse:
     visible: false
 mri:
-    TA: 2.0
+    TA: 1.5
     TR: 1.5
+    scanning: true
     simulate: false
     skip: 0
     sound: false
     sync: t
-    volumes: 10
+    volumes: 100
 preferences:
     general:
         audioLib: SoundDevice

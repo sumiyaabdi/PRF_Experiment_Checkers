@@ -25,38 +25,44 @@ class PRFSession(Session):
         
         super().__init__(output_str=output_str, settings_file=settings_file)      
             
-        
+        #create all stimuli and trials at the beginning of the experiment, to save time and resources        
         self.create_stimuli()
-
         self.create_trials()
+        
+        #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
+        if self.settings['mri']['scanning']==True:
+        
+            self.mri_trigger='t'
+        
+
 
 
 
 
     def create_stimuli(self):
         
-        
-        mask = filters.makeMask(matrixSize=self.win.size[0], 
-                                shape='raisedCosine', 
-                                radius=np.array([self.win.size[1]/self.win.size[0], 1.0]),#4*self.deg2pix(self.settings['prf_max_eccentricity'])* #self.deg2pix(self.settings['prf_max_eccentricity']),#0.5,#self.settings['pixstim_bg_aperture_fraction']*(self.screen_pix_size[1]/self.screen_pix_size[0]),
-                                center=(0.0, 0.0), 
-                                range=[-1, 1], 
-                                fringeWidth=0.02#self.settings['aperture_stim_sd']*(self.screen_pix_size[1]/self.screen_pix_size[0])
-                                )
 
+        
+        #generate PRF stimulus
         self.prf_stim = PRFStim(session=self, 
                         squares_in_bar=self.settings['PRF stimulus settings']['Squares in bar'], 
                         bar_width_deg=self.settings['PRF stimulus settings']['Bar width in degrees'],
                         flicker_frequency=self.settings['PRF stimulus settings']['Checkers motion speed'])#self.deg2pix(self.settings['prf_max_eccentricity']))    
         
 
-
-        self.instruction_string = """Please fixate in the center of the screen. Your task is to respond whenever the dot changes color."""
+        #currently unused
+        #self.instruction_string = """Please fixate in the center of the screen. Your task is to respond whenever the dot changes color."""
         
 
-
-
-
+        #generate raised cosine alpha mask
+        mask = filters.makeMask(matrixSize=self.win.size[0], 
+                                shape='raisedCosine', 
+                                radius=np.array([self.win.size[1]/self.win.size[0], 1.0]),
+                                center=(0.0, 0.0), 
+                                range=[-1, 1], 
+                                fringeWidth=0.02
+                                )
+         #############IMPORTANT, HACK NOTE. it is possible that the /2 in size here should be removed once psychopy window size problem is fixed       
         self.mask_stim = visual.GratingStim(self.win, 
                                         mask=-mask, 
                                         tex=None, 
@@ -68,10 +74,10 @@ class PRFSession(Session):
 
 
 
-        # fixation circle border
-        print(self.win.size)
+        #as current basic task, generate fixation circles of different colors, with black border
+        
         fixation_radius_pixels=tools.monitorunittools.deg2pix(self.settings['PRF stimulus settings']['Size fixation dot in degrees'], self.monitor)/2
-        print(fixation_radius_pixels)
+
         self.fixation_circle = visual.Circle(self.win, 
             radius=fixation_radius_pixels, 
             units='pix', lineColor='black')
@@ -92,14 +98,26 @@ class PRFSession(Session):
     def create_trials(self):
         """creates trials by setting up prf stimulus sequence"""
         self.trial_list=[]
-        #create as many trials as TRs, + one for initial instructions
-        self.trial_number=self.settings['PRF stimulus settings']['Bar pass duration in TRs']*len(self.settings['PRF stimulus settings']['Bar orientations'])
         
-        self.bar_orientation_at_TR = np.concatenate((-np.ones(1), np.repeat(self.settings['PRF stimulus settings']['Bar orientations'], self.settings['PRF stimulus settings']['Bar pass duration in TRs'])))
-        self.bar_pos_in_ori = np.concatenate((np.zeros(1), self.win.size[1]*np.tile(np.linspace(-0.5,0.5,self.settings['PRF stimulus settings']['Bar pass duration in TRs']), len(self.settings['PRF stimulus settings']['Bar orientations']))))
+        #create as many trials as TRs
+        self.trial_number=self.settings['PRF stimulus settings']['Bar pass duration in TRs']*len(self.settings['PRF stimulus settings']['Bar orientations'])
+  
+      
+        #create bar orientation list at each TR (this can be done in many different ways according to necessity)
+        #for example, currently blank periods have same length as bar passes. this can easily be changed here
+        self.bar_orientation_at_TR = np.repeat(self.settings['PRF stimulus settings']['Bar orientations'], self.settings['PRF stimulus settings']['Bar pass duration in TRs'])
+   
+           
+        #############IMPORTANT, HACK NOTE
+        #the first 0.5 should in principle be removed. it is due to the window not being of the correct size, but for some reason
+        #set_pos methods of PRF bar stimulus still recover the correct value of window size  
+        self.bar_pos_in_ori = 0.5*self.win.size[1]*np.tile(np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass duration in TRs']), len(self.settings['PRF stimulus settings']['Bar orientations']))
+   
+     
+        #random bar direction at each step
         self.bar_direction_at_TR = np.round(np.random.rand(self.trial_number))
         
-        
+        #trial list
         for i in range(self.trial_number):
                 
             self.trial_list.append(PRFTrial(session=self,
@@ -111,28 +129,23 @@ class PRFSession(Session):
                            #,tracker=self.tracker
                            ))
 
-        ##################################################################################
-        ## timings etc for the bar passes
-        ##################################################################################
 
-
- 
-
-        #the dot will changes colour approximately once every two TRs       
+        #times for dot color change
+        #with this basic implementation, the dot will changes colour approximately once every two TRs       
         self.total_time = self.settings['PRF stimulus settings']['Bar pass duration in TRs']*self.settings['mri']['TR']*len(self.settings['PRF stimulus settings']['Bar orientations'])
         self.dot_switch_color_times = np.sort(self.total_time*np.random.rand(int(self.trial_number/2))) 
         self.current_dot_time=0
         self.next_dot_time=1
 
- 
-
+        #only for testing purposes
+        print(self.win.size)
 
     def draw_stimulus(self):
+        #this timing is only used for the motion of checkerboards inside the bar. it does not have any effect on the actual bar motion
         present_time = self.clock.getTime() - self.current_trial_start_time
-        prf_time = present_time / (self.settings['mri']['TR'])
+        prf_time = present_time #/ (self.settings['mri']['TR'])
   
-    
-    # print(present_time, present_bar_pass, prf_time)
+        #draw the bar at the required orientation for this TR, unless the orientation is -1, code for a blank period
         if self.current_trial.bar_orientation != -1:
             self.prf_stim.draw(time=prf_time, 
                                pos_in_ori=self.current_trial.bar_position_in_ori, 
@@ -140,7 +153,7 @@ class PRFSession(Session):
                                bar_direction=self.current_trial.bar_direction)
             
             
-
+        #draw the correct dot color
         if self.next_dot_time<len(self.dot_switch_color_times):
             if present_time<self.dot_switch_color_times[self.current_dot_time]:                
                 self.fixation_disk_1.draw()
@@ -166,6 +179,7 @@ class PRFSession(Session):
             self.current_trial = self.trial_list[trial_idx]
             self.current_trial_start_time = self.clock.getTime()
             self.current_trial.run()
+
             
             
 

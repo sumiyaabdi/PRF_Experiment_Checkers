@@ -4,7 +4,7 @@ preferences:
         units: deg
 
 window:
-    size: [1680, 1050]
+    size: [2000, 1500]
     pos: [0, 0]
     color: [0, 0, 0]
     fullscr: True
@@ -24,18 +24,23 @@ eyetracker:
     model: eyelink
 
 mri:
-    simulate: False
+    scanning: True  #set this to true if the session is in the real scanner. syncs stimulus to 't' input
+
+    simulate: False #set this to true to simulate scanning (generates 't' automatically)
     TR: 1.5  # seconds between volume acquisitions
-    TA: 2.0  # seconds to acquire one volume
-    volumes: 10  # number of 3D volumes to obtain in a given scanning run
-    sync: t  # character used as flag for sync timing, default=‘5’
+    TA: 1.5  # seconds to acquire one volume
+    volumes: 100  # number of 3D volumes to obtain in a given scanning run
+    sync: t  # character used as flag for simulation sync timing, default=‘5’
     skip: 0  # how many frames to silently omit initially during T1 stabilization, no sync pulse.
     sound: False  # simulate scanner noise
 
 PRF stimulus settings:
-    Squares in bar: 2
-    Bar width in degrees: 1.25
+    Squares in bar: 4
+    Bar width in degrees: 2.5
     Checkers motion speed: 4
     Size fixation dot in degrees: 0.4
-    Bar pass duration in TRs: 20
+    Bar pass duration in TRs: 10
     Bar orientations: [0,  45, -1, 225, 270, -1,  315, 180, -1,  135, 90,  -1, -1]
+
+
+
