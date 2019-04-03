@@ -185,10 +185,9 @@ class PRFSession(Session):
             self.current_trial_start_time = self.clock.getTime()
             self.current_trial.run()
 
-            
-            
 
 
+        self.win.saveMovieFrames('$PWD/logs/Screenshots/Screenshot.png')
         self.close()
 
         

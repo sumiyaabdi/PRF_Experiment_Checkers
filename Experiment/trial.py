@@ -47,6 +47,7 @@ class PRFTrial(Trial):
          events = event.getKeys(timeStamped=self.session.clock)
          if events:
              if 'q' in [ev[0] for ev in events]:  # specific key in settings?
+                 self.session.win.saveMovieFrames('./logs/Screenshots/Screenshot.png')
                  self.session.close()
                  self.session.quit()
  
@@ -55,8 +56,11 @@ class PRFTrial(Trial):
                  if key == self.session.mri_trigger:
                      event_type = 'pulse'
                      #marco edit. the second bit is a hack to avoid double-counting of the first t when simulating a scanner
-                     if self.session.settings['PRF stimulus settings']['Scanner sync']==True and t>0.1:
+                     if self.session.settings['PRF stimulus settings']['Scanner sync']==True and t>0.1:                       
                          self.exit_phase=True
+                         #ideally, for speed, would want  getMovieFrame to be called right after the first winflip. 
+                         #but this would have to be dun from inside trial.run()
+                         self.session.win.getMovieFrame()
                  else:
                      event_type = 'response'
  
