@@ -24,14 +24,19 @@ class PRFSession(Session):
         
         
         super().__init__(output_str=output_str, settings_file=settings_file)      
+        
+        #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
+        if self.settings['PRF stimulus settings']['Scanner sync']==True:
+            self.bar_step_length = self.settings['mri']['TR']
+            self.mri_trigger='t'
+        else:
+            self.bar_step_length = self.settings['PRF stimulus settings']['Bar step length']
             
+        
         #create all stimuli and trials at the beginning of the experiment, to save time and resources        
         self.create_stimuli()
         self.create_trials()
-        
-        #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
-        if self.settings['mri']['simulate']==False and self.settings['PRF stimulus settings']['scanner sync']==True:
-            self.mri_trigger='t'
+            
         
 
 
@@ -99,18 +104,18 @@ class PRFSession(Session):
         self.trial_list=[]
         
         #create as many trials as TRs
-        self.trial_number=self.settings['PRF stimulus settings']['Bar pass duration in TRs']*len(self.settings['PRF stimulus settings']['Bar orientations'])
+        self.trial_number=self.settings['PRF stimulus settings']['Bar pass steps']*len(self.settings['PRF stimulus settings']['Bar orientations'])
   
       
         #create bar orientation list at each TR (this can be done in many different ways according to necessity)
         #for example, currently blank periods have same length as bar passes. this can easily be changed here
-        self.bar_orientation_at_TR = np.repeat(self.settings['PRF stimulus settings']['Bar orientations'], self.settings['PRF stimulus settings']['Bar pass duration in TRs'])
+        self.bar_orientation_at_TR = np.repeat(self.settings['PRF stimulus settings']['Bar orientations'], self.settings['PRF stimulus settings']['Bar pass steps'])
    
            
-        #############IMPORTANT, HACK NOTE
+        #############HACK NOTE
         #the first 0.5 should in principle be removed. it is due to the window not being of the correct size, but for some reason
         #set_pos methods of PRF bar stimulus still recover the correct value of window size  
-        self.bar_pos_in_ori = 0.5*self.win.size[1]*np.tile(np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass duration in TRs']), len(self.settings['PRF stimulus settings']['Bar orientations']))
+        self.bar_pos_in_ori = 0.5*self.win.size[1]*np.tile(np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass steps']), len(self.settings['PRF stimulus settings']['Bar orientations']))
    
      
         #random bar direction at each step
@@ -130,7 +135,7 @@ class PRFSession(Session):
 
 
         #times for dot color change
-        self.total_time = self.settings['PRF stimulus settings']['Bar pass duration in TRs']*self.settings['mri']['TR']*len(self.settings['PRF stimulus settings']['Bar orientations'])
+        self.total_time = self.settings['PRF stimulus settings']['Bar pass steps']*self.bar_step_length*len(self.settings['PRF stimulus settings']['Bar orientations'])
         #with this basic implementation, the dot will changes colour on average once every two TRs       
         self.dot_switch_color_times = np.sort(self.total_time*np.random.rand(int(self.trial_number/2))) 
         self.current_dot_time=0
@@ -142,8 +147,8 @@ class PRFSession(Session):
     def draw_stimulus(self):
         #this timing is only used for the motion of checkerboards inside the bar. it does not have any effect on the actual bar motion
         present_time = self.clock.getTime() - self.exp_start
-        present_trial_time = self.clock.getTime() - self.current_trial_start_time
-        prf_time = present_trial_time / (self.settings['mri']['TR'])
+        #present_trial_time = self.clock.getTime() - self.current_trial_start_time
+        prf_time = present_time #/ (self.bar_step_length)
   
         #draw the bar at the required orientation for this TR, unless the orientation is -1, code for a blank period
         if self.current_trial.bar_orientation != -1:

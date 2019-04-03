@@ -22,12 +22,12 @@ class PRFTrial(Trial):
         self.session=session
 
         #here we decide how to go from each trial (bar position) to the next.    
-#        if self.session.settings['PRF stimulus settings']['scanner sync']==True or self.session.settings['mri']['simulate']==True:
-#            #dummy value: if scanning or simulating a scanner, everything is synced to the output 't' of the scanner
-#            phase_durations = [1000]
-#        else:
-            #if not synced to a real or simulated scanner, take the TR setting as phase/trial duration
-        phase_durations = [4] #[self.session.settings['mri']['TR']]
+        if self.session.settings['PRF stimulus settings']['Scanner sync']==True:
+            #dummy value: if scanning or simulating a scanner, everything is synced to the output 't' of the scanner
+            phase_durations = [1000]
+        else:
+            #if not synced to a real or simulated scanner, take the bar pass step as length
+            phase_durations = [self.session.settings['PRF stimulus settings']['Bar step length']] 
 
         super().__init__(session, trial_nr,
             phase_durations,
@@ -55,7 +55,7 @@ class PRFTrial(Trial):
                  if key == self.session.mri_trigger:
                      event_type = 'pulse'
                      #marco edit. the second bit is a hack to avoid double-counting of the first t when simulating a scanner
-                     if self.session.settings['PRF stimulus settings']['scanner sync']==True and t>0.5:
+                     if self.session.settings['PRF stimulus settings']['Scanner sync']==True and t>0.1:
                          self.exit_phase=True
                  else:
                      event_type = 'response'

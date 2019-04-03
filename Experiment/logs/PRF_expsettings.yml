@@ -13,12 +13,13 @@ PRF stimulus settings:
     - 90
     - -1
     - -1
-    Bar pass duration in TRs: 16
+    Bar pass steps: 16
+    Bar step length: 5
     Bar width in degrees: 1.25
-    Checkers motion speed: 4
+    Checkers motion speed: 3.5
+    Scanner sync: true
     Size fixation dot in degrees: 0.4
     Squares in bar: 2
-    scanner sync: true
 eyetracker:
     model: eyelink
 monitor:

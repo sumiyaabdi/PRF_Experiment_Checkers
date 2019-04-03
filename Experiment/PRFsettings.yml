@@ -24,7 +24,7 @@ eyetracker:
     model: eyelink
 
 mri:
-    simulate: True #set this to true to simulate scanning
+    simulate: True #set this to true to simulate a virtual scanner
     TR: 1.5  # seconds between volume acquisitions
     TA: 1.5  # seconds to acquire one volume
     volumes: 100  # number of 3D volumes to obtain in a given scanning run
@@ -34,13 +34,14 @@ mri:
 
 
 PRF stimulus settings:
-    scanner sync: True #set this to true to simulate scanning
+    Scanner sync: True # set this to true to make bar move on input 't'
     Squares in bar: 2
-    Bar width in degrees: 1.25
-    Checkers motion speed: 4
-    Size fixation dot in degrees: 0.4
-    Bar pass duration in TRs: 16
     Bar orientations: [0,  45, -1, 225, 270, -1,  315, 180, -1,  135, 90,  -1, -1]
+    Bar width in degrees: 1.25
+    Checkers motion speed: 3.5 # checkers direction is randomly up/down at each bar step
+    Size fixation dot in degrees: 0.4 # dot changes color on average every two TRs (or bar steps)
+    Bar pass steps: 16 #number of steps the bar takes to traverse the aperture
+    Bar step length: 5 # in seconds. this is only used if Scanner sync is set to False
 
 
 
