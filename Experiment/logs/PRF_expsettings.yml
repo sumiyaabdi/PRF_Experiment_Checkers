@@ -16,7 +16,7 @@ PRF stimulus settings:
     Bar pass steps: 16
     Bar step length: 5
     Bar width in degrees: 1.25
-    Checkers motion speed: 3.5
+    Checkers motion speed: 3
     Scanner sync: true
     Size fixation dot in degrees: 0.4
     Squares in bar: 2
@@ -32,7 +32,7 @@ mouse:
 mri:
     TA: 1.5
     TR: 1.5
-    simulate: true
+    simulate: false
     skip: 0
     sound: false
     sync: t
