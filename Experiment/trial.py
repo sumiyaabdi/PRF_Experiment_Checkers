@@ -10,6 +10,7 @@ from exptools2.core.trial import Trial
 from psychopy import event
 
 
+
 class PRFTrial(Trial):
 
     def __init__(self, session, trial_nr, bar_orientation, bar_position_in_ori, bar_direction, *args, **kwargs):
@@ -47,7 +48,10 @@ class PRFTrial(Trial):
          events = event.getKeys(timeStamped=self.session.clock)
          if events:
              if 'q' in [ev[0] for ev in events]:  # specific key in settings?
-                 self.session.win.saveMovieFrames('./logs/Screenshots/Screenshot.png')
+                 
+                 if self.session.settings['PRF stimulus settings']['Scanner sync']==True:
+                     self.session.win.saveMovieFrames('./logs/Screenshots/Screenshot.png')
+                     
                  self.session.close()
                  self.session.quit()
  

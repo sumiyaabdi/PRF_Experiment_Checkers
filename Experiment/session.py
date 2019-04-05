@@ -7,6 +7,7 @@ Created on Mon Feb 25 14:05:10 2019
 """
 
 import numpy as np
+import os
 from psychopy import visual
 from psychopy.visual import filters
 from psychopy import tools
@@ -29,8 +30,13 @@ class PRFSession(Session):
         if self.settings['PRF stimulus settings']['Scanner sync']==True:
             self.bar_step_length = self.settings['mri']['TR']
             self.mri_trigger='t'
+                     
+            if not os.path.exists('./logs/Screenshots'):
+                os.mkdir('./logs/Screenshots')
         else:
             self.bar_step_length = self.settings['PRF stimulus settings']['Bar step length']
+            
+        
             
         
         #create all stimuli and trials at the beginning of the experiment, to save time and resources        
