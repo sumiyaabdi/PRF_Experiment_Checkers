@@ -2,7 +2,10 @@
 .tsv
 .png
 .txt
+PRF_expsettings.yml
 
 #and so on
 __pycache__/
+
+#macbook stuff
 .DS_Store
