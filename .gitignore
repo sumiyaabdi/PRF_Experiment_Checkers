@@ -1,9 +1,3 @@
-#ignore logs
-.tsv
-.png
-.txt
-PRF_expsettings.yml
-
 #and so on
 __pycache__/
 logs/
