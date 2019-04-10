@@ -1,4 +1,8 @@
 # PRF_Experiment
-Repository for a simple PRF mapping experiment, making use of exptools2
+Repository for a simple PRF mapping experiment
+Requirements: psychopy and exptools2
 
-python main.py PRF $PWD/PRFsettings.yml
+put your settings in a file named PRFsettings_Condition.yml within the Experiment folder (change 'Condition' to your actual condition name)
+
+Run line
+python main.py SubjectName SessionNumber Condition RunNumber

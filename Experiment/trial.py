@@ -49,8 +49,8 @@ class PRFTrial(Trial):
          if events:
              if 'q' in [ev[0] for ev in events]:  # specific key in settings?
                  
-                 if self.session.settings['PRF stimulus settings']['Scanner sync']==True:
-                     self.session.win.saveMovieFrames('./logs/Screenshots/Screenshot.png')
+                 if self.session.settings['PRF stimulus settings']['Screenshot']==True:
+                     self.session.win.saveMovieFrames(self.session.screen_dir+'/Screenshot.png')
                      
                  self.session.close()
                  self.session.quit()
@@ -64,7 +64,8 @@ class PRFTrial(Trial):
                          self.exit_phase=True
                          #ideally, for speed, would want  getMovieFrame to be called right after the first winflip. 
                          #but this would have to be dun from inside trial.run()
-                         self.session.win.getMovieFrame()
+                         if self.session.settings['PRF stimulus settings']['Screenshot']==True:
+                             self.session.win.getMovieFrame()
                  else:
                      event_type = 'response'
  

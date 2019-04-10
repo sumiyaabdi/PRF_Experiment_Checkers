@@ -6,15 +6,30 @@ Created on Mon Feb 25 14:04:44 2019
 @author: marcoaqil
 """
 import sys
+import os
 from session import PRFSession
 
 
 def main():
-    output_str = sys.argv[1]
-    settings_file = sys.argv[2]
+    subject = sys.argv[1]
+    session = sys.argv[2]
+    # 5 conditions: StandardStandard, SmallStandard, SmallSlow, LargeStandard, LargeFast
+    condition = sys.argv[3]
+    #in the full experiment we would do 3 runs
+    run = sys.argv[4]
+    
+    
+    output_str= 'sub-'+subject+'_session-'+session+'_cond-'+condition+'_run-'+run
+    
+    output_dir = './Logs_'+output_str
+    
+    if os.path.exists(output_dir):
+        print("Warning: output directory already exists. Renaming to avoid overwriting.")
+        output_dir = output_dir + '-redo'
+    
+    settings_file='./PRFsettings_'+condition+'.yml'
 
-
-    ts = PRFSession(output_str=output_str, settings_file=settings_file)
+    ts = PRFSession(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
     ts.run()
 
 if __name__ == '__main__':

@@ -21,20 +21,23 @@ from stim import PRFStim
 class PRFSession(Session):
 
     
-    def __init__(self, output_str, settings_file):
+    def __init__(self, output_str, output_dir, settings_file):
         
         
-        super().__init__(output_str=output_str, settings_file=settings_file)      
+        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)      
         
         #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
         if self.settings['PRF stimulus settings']['Scanner sync']==True:
             self.bar_step_length = self.settings['mri']['TR']
             self.mri_trigger='t'
                      
-            if not os.path.exists('./logs/Screenshots'):
-                os.mkdir('./logs/Screenshots')
         else:
             self.bar_step_length = self.settings['PRF stimulus settings']['Bar step length']
+            
+        if self.settings['PRF stimulus settings']['Screenshot']==True:
+            self.screen_dir=output_dir+'/Screenshots'
+            if not os.path.exists(self.screen_dir):
+                os.mkdir(self.screen_dir)
             
         
             
@@ -72,12 +75,12 @@ class PRFSession(Session):
                                 range=[-1, 1], 
                                 fringeWidth=0.02
                                 )
-         #############IMPORTANT, HACK NOTE. it is possible that the /2 in size here should be removed once psychopy window size problem is fixed       
+
         self.mask_stim = visual.GratingStim(self.win, 
                                         mask=-mask, 
                                         tex=None, 
                                         units='pix',
-                                        size=[self.win.size[0]/2,self.win.size[1]/2], 
+                                        size=[self.win.size[0],self.win.size[1]], 
                                         pos = np.array((0.0,0.0)), 
                                         color = [0,0,0]) 
         
@@ -109,22 +112,36 @@ class PRFSession(Session):
         """creates trials by setting up prf stimulus sequence"""
         self.trial_list=[]
         
-        #create as many trials as TRs
-        self.trial_number=self.settings['PRF stimulus settings']['Bar pass steps']*len(self.settings['PRF stimulus settings']['Bar orientations'])
+        bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
+        #create as many trials as TRs. 5 extra TRs at beginning + bar passes + blanks
+        self.trial_number = 5 + self.settings['PRF stimulus settings']['Bar pass steps']*len(np.where(bar_orientations != -1)[0]) + self.settings['PRF stimulus settings']['Blanks length']*len(np.where(bar_orientations == -1)[0])
   
-      
+        print("Expected number of TRs: %d"%self.trial_number)
         #create bar orientation list at each TR (this can be done in many different ways according to necessity)
         #for example, currently blank periods have same length as bar passes. this can easily be changed here
-        self.bar_orientation_at_TR = np.repeat(self.settings['PRF stimulus settings']['Bar orientations'], self.settings['PRF stimulus settings']['Bar pass steps'])
-   
+        steps_array=self.settings['PRF stimulus settings']['Bar pass steps']*np.ones(len(bar_orientations))
+        blanks_array=self.settings['PRF stimulus settings']['Blanks length']*np.ones(len(bar_orientations))
+    
+        repeat_times=np.where(bar_orientations == -1, blanks_array, steps_array).astype(int)
+ 
+        self.bar_orientation_at_TR = np.concatenate((-1*np.ones(5), np.repeat(bar_orientations, repeat_times)))
+        
            
-        #############HACK NOTE
-        #the first 0.5 should in principle be removed. it is due to the window not being of the correct size, but for some reason
-        #set_pos methods of PRF bar stimulus still recover the correct value of window size  
-        self.bar_pos_in_ori = 0.5*self.win.size[1]*np.tile(np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass steps']), len(self.settings['PRF stimulus settings']['Bar orientations']))
-   
+        bar_pos_array = self.win.size[1]*np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass steps'])
+        blank_array = np.zeros(self.settings['PRF stimulus settings']['Blanks length'])
+        
+        #the 5 empty trials at beginning
+        self.bar_pos_in_ori=np.zeros(5)
+        
+        #bar position at TR
+        for i in range(len(bar_orientations)):
+            if bar_orientations[i]==-1:
+                self.bar_pos_in_ori=np.append(self.bar_pos_in_ori, blank_array)
+            else:
+                self.bar_pos_in_ori=np.append(self.bar_pos_in_ori, bar_pos_array)
+                   
      
-        #random bar direction at each step
+        #random bar direction at each step. could also make this time-based
         self.bar_direction_at_TR = np.round(np.random.rand(self.trial_number))
         
         #trial list
@@ -141,9 +158,9 @@ class PRFSession(Session):
 
 
         #times for dot color change
-        self.total_time = self.settings['PRF stimulus settings']['Bar pass steps']*self.bar_step_length*len(self.settings['PRF stimulus settings']['Bar orientations'])
-        #with this basic implementation, the dot will changes colour on average once every two TRs       
-        self.dot_switch_color_times = np.sort(self.total_time*np.random.rand(int(self.trial_number/2))) 
+        self.total_time = self.trial_number*self.bar_step_length
+        #with this basic implementation, the dot will changes colour on average once every three TRs       
+        self.dot_switch_color_times = np.sort(self.total_time*np.random.rand(int(self.trial_number/3))) 
         self.current_dot_time=0
         self.next_dot_time=1
 
@@ -192,8 +209,9 @@ class PRFSession(Session):
             self.current_trial.run()
 
 
-
-        self.win.saveMovieFrames('$PWD/logs/Screenshots/Screenshot.png')
+        if self.settings['PRF stimulus settings']['Screenshot']==True:
+            self.win.saveMovieFrames(self.screen_dir+'/Screenshot.png')
+            
         self.close()
 
         
