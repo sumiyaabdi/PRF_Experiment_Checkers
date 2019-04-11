@@ -24,7 +24,7 @@ class PRFSession(Session):
     def __init__(self, output_str, output_dir, settings_file):
         
         
-        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)      
+        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
         
         #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
         if self.settings['PRF stimulus settings']['Scanner sync']==True:
@@ -91,19 +91,19 @@ class PRFSession(Session):
         
         fixation_radius_pixels=tools.monitorunittools.deg2pix(self.settings['PRF stimulus settings']['Size fixation dot in degrees'], self.monitor)/2
 
-        self.fixation_circle = visual.Circle(self.win, 
-            radius=fixation_radius_pixels, 
-            units='pix', lineColor='black')
+#        self.fixation_circle = visual.Circle(self.win, 
+#            radius=fixation_radius_pixels, 
+#            units='pix', lineColor='black')
         
         
         #two colors of the fixation circle for the task
         self.fixation_disk_0 = visual.Circle(self.win, 
             units='pix', radius=fixation_radius_pixels, 
-            fillColor=[1,-1,-1])
+            fillColor=[1,-1,-1], lineColor=[1,-1,-1])
         
         self.fixation_disk_1 = visual.Circle(self.win, 
             units='pix', radius=fixation_radius_pixels, 
-            fillColor=[-1,1,-1])
+            fillColor=[-1,1,-1], lineColor=[-1,1,-1])
 
 
 
@@ -161,10 +161,13 @@ class PRFSession(Session):
         self.total_time = self.trial_number*self.bar_step_length
         #with this basic implementation, the dot will changes colour on average once every three TRs       
         self.dot_switch_color_times = np.sort(self.total_time*np.random.rand(int(self.trial_number/3))) 
+        
+        #needed to keep track of which dot to print
         self.current_dot_time=0
         self.next_dot_time=1
 
         #only for testing purposes
+        np.save(self.output_dir+'/'+self.output_str+'_DotSwitchColorTimes.npy', self.dot_switch_color_times)
         print(self.win.size)
 
     def draw_stimulus(self):
@@ -192,7 +195,7 @@ class PRFSession(Session):
                     self.current_dot_time+=2
                     self.next_dot_time+=2
                     
-        self.fixation_circle.draw()
+        #self.fixation_circle.draw()
 
 
 
