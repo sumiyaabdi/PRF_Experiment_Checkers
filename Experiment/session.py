@@ -174,8 +174,8 @@ class PRFSession(Session):
         
         
         #DOT COLOR CHANGE TIMES    
-        self.dot_switch_color_times = np.arange(2,self.total_time,2)
-        self.dot_switch_color_times += np.random.rand(len(self.dot_switch_color_times))-0.5
+        self.dot_switch_color_times = np.arange(3,self.total_time,3)
+        self.dot_switch_color_times += (2*np.random.rand(len(self.dot_switch_color_times))-1)
         
         
         #needed to keep track of which dot to print
