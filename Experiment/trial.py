@@ -25,17 +25,23 @@ class PRFTrial(Trial):
         #here we decide how to go from each trial (bar position) to the next.    
         if self.session.settings['PRF stimulus settings']['Scanner sync']==True:
             #dummy value: if scanning or simulating a scanner, everything is synced to the output 't' of the scanner
-            phase_durations = [1000]
+            phase_durations = [100]
         else:
             #if not synced to a real or simulated scanner, take the bar pass step as length
             phase_durations = [self.session.settings['PRF stimulus settings']['Bar step length']] 
+            
+        #add topup time to last trial
+        if self.session.settings['mri']['topup_scan']==True:
+            if self.ID == self.session.trial_number-1:
+                phase_durations=[self.session.topup_scan_duration]
+            
 
         super().__init__(session, trial_nr,
             phase_durations,
             *args,
             **kwargs)
 
-
+    
     def draw(self, *args, **kwargs):
         # draw bar stimulus and circular (raised cosine) aperture from Session class
         self.session.draw_stimulus() 
@@ -68,6 +74,20 @@ class PRFTrial(Trial):
                              self.session.win.getMovieFrame()
                  else:
                      event_type = 'response'
+                     
+                     #tracking percentage of correct responses per session
+                     if self.session.current_dot_time==0:
+                         if t>self.session.dot_switch_color_times[0] and t<self.session.dot_switch_color_times[0] + 0.8:
+                             self.session.correct_responses += 1
+                     else:
+                         if t>self.session.dot_switch_color_times[self.session.current_dot_time] and t<self.session.dot_switch_color_times[self.session.current_dot_time] + 0.8:
+                             self.session.correct_responses += 1
+                             
+                         elif t>self.session.dot_switch_color_times[self.session.next_dot_time] and t<self.session.dot_switch_color_times[self.session.next_dot_time] + 0.8:
+                             self.session.correct_responses += 1
+                             
+
+
  
                  idx = self.session.global_log.shape[0]
                  self.session.global_log.loc[idx, 'trial_nr'] = self.trial_nr

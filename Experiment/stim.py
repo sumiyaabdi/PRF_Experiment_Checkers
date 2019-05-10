@@ -26,7 +26,8 @@ class PRFStim(object):
 
         #calculate the bar width in pixels, with respect to the texture
         self.bar_width_in_pixels = tools.monitorunittools.deg2pix(bar_width_deg, self.session.monitor)*self.tex_nr_pix/self.session.win.size[1]
-
+        
+        
         #construct basic space for textures
         bar_width_in_radians = np.pi*self.squares_in_bar
         bar_pixels_per_radian = bar_width_in_radians/self.bar_width_in_pixels

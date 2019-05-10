@@ -27,9 +27,13 @@ class PRFSession(Session):
         super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
         
         #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
+        if self.settings['mri']['topup_scan']==True:
+            self.topup_scan_duration=self.settings['mri']['topup_duration']
+        
         if self.settings['PRF stimulus settings']['Scanner sync']==True:
             self.bar_step_length = self.settings['mri']['TR']
             self.mri_trigger='t'
+
                      
         else:
             self.bar_step_length = self.settings['PRF stimulus settings']['Bar step length']
@@ -80,6 +84,7 @@ class PRFSession(Session):
                                         mask=-mask, 
                                         tex=None, 
                                         units='pix',
+                                        
                                         size=[self.win.size[0],self.win.size[1]], 
                                         pos = np.array((0.0,0.0)), 
                                         color = [0,0,0]) 
@@ -112,6 +117,8 @@ class PRFSession(Session):
         """creates trials by setting up prf stimulus sequence"""
         self.trial_list=[]
         
+        self.correct_responses = 0
+        
         bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         #create as many trials as TRs. 5 extra TRs at beginning + bar passes + blanks
         self.trial_number = 5 + self.settings['PRF stimulus settings']['Bar pass steps']*len(np.where(bar_orientations != -1)[0]) + self.settings['PRF stimulus settings']['Blanks length']*len(np.where(bar_orientations == -1)[0])
@@ -126,8 +133,10 @@ class PRFSession(Session):
  
         self.bar_orientation_at_TR = np.concatenate((-1*np.ones(5), np.repeat(bar_orientations, repeat_times)))
         
-           
+        
         bar_pos_array = self.win.size[1]*np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass steps'])
+        
+        
         blank_array = np.zeros(self.settings['PRF stimulus settings']['Blanks length'])
         
         #the 5 empty trials at beginning
@@ -157,10 +166,17 @@ class PRFSession(Session):
                            ))
 
 
-        #times for dot color change
-        self.total_time = self.trial_number*self.bar_step_length
-        #with this basic implementation, the dot will changes colour on average once every three TRs       
-        self.dot_switch_color_times = np.sort(self.total_time*np.random.rand(int(self.trial_number/3))) 
+        #times for dot color change. continue the task into the topup
+        self.total_time = self.trial_number*self.bar_step_length 
+        
+        if self.settings['mri']['topup_scan']==True:
+            self.total_time += self.topup_scan_duration
+        
+        
+        #DOT COLOR CHANGE TIMES    
+        self.dot_switch_color_times = np.arange(2,self.total_time,2)
+        self.dot_switch_color_times += np.random.rand(len(self.dot_switch_color_times))-0.5
+        
         
         #needed to keep track of which dot to print
         self.current_dot_time=0
@@ -172,9 +188,12 @@ class PRFSession(Session):
 
     def draw_stimulus(self):
         #this timing is only used for the motion of checkerboards inside the bar. it does not have any effect on the actual bar motion
-        present_time = self.clock.getTime() - self.exp_start
+        present_time = self.clock.getTime()
+        
         #present_trial_time = self.clock.getTime() - self.current_trial_start_time
         prf_time = present_time #/ (self.bar_step_length)
+        
+        print(present_time)
   
         #draw the bar at the required orientation for this TR, unless the orientation is -1, code for a blank period
         if self.current_trial.bar_orientation != -1:
@@ -211,7 +230,9 @@ class PRFSession(Session):
             self.current_trial_start_time = self.clock.getTime()
             self.current_trial.run()
 
-
+        print('Percentage correct responses: %.2f%%'%(100*self.correct_responses/len(self.dot_switch_color_times)))
+        
+        
         if self.settings['PRF stimulus settings']['Screenshot']==True:
             self.win.saveMovieFrames(self.screen_dir+'/Screenshot.png')
             

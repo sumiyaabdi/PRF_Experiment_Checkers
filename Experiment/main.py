@@ -13,13 +13,14 @@ from session import PRFSession
 def main():
     subject = sys.argv[1]
     session = sys.argv[2]
-    # 5 conditions: StandardStandard, SmallStandard, SmallSlow, LargeStandard, LargeFast
+    # 5 conditions: 2R, 1R, 1S, 4R, 4F 
+    #(2 squares Regular speed, 1 square Regular, 1 square Slow, 4 square Regular, 4 square Fast)
     condition = sys.argv[3]
     #in the full experiment we would do 3 runs
     run = sys.argv[4]
     
     
-    output_str= 'sub-'+subject+'_session-'+session+'_cond-'+condition+'_run-'+run
+    output_str= 'sub-'+subject+'_ses-'+session+'_task-'+condition+'_run-'+run
     
     output_dir = './Logs_'+output_str
     
