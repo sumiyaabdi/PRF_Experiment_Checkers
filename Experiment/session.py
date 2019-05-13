@@ -39,7 +39,7 @@ class PRFSession(Session):
             self.bar_step_length = self.settings['PRF stimulus settings']['Bar step length']
             
         if self.settings['PRF stimulus settings']['Screenshot']==True:
-            self.screen_dir=output_dir+'/Screenshots'
+            self.screen_dir=output_dir+'/'+output_str+'_Screenshots'
             if not os.path.exists(self.screen_dir):
                 os.mkdir(self.screen_dir)
             
@@ -117,7 +117,9 @@ class PRFSession(Session):
         """creates trials by setting up prf stimulus sequence"""
         self.trial_list=[]
         
+        #simple tools to check subject responses online
         self.correct_responses = 0
+        self.total_responses = 0
         
         bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         #create as many trials as TRs. 5 extra TRs at beginning + bar passes + blanks
@@ -174,7 +176,7 @@ class PRFSession(Session):
         
         
         #DOT COLOR CHANGE TIMES    
-        self.dot_switch_color_times = np.arange(3,self.total_time,3)
+        self.dot_switch_color_times = np.arange(3,self.total_time,3.5)
         self.dot_switch_color_times += (2*np.random.rand(len(self.dot_switch_color_times))-1)
         
         
@@ -229,12 +231,16 @@ class PRFSession(Session):
             self.current_trial = self.trial_list[trial_idx]
             self.current_trial_start_time = self.clock.getTime()
             self.current_trial.run()
-
-        print('Percentage correct responses: %.2f%%'%(100*self.correct_responses/len(self.dot_switch_color_times)))
+        
+        print('Expected number of responses: %d'%len(self.dot_switch_color_times))
+        print('Total subject responses: %d'%self.total_responses)
+        print('Correct responses (within 0.8s of dot color change): %d'%self.correct_responses)
+        
+        #print('Percentage of correctly answered trials: %.2f%%'%(100*self.correct_responses/len(self.dot_switch_color_times)))
         
         
         if self.settings['PRF stimulus settings']['Screenshot']==True:
-            self.win.saveMovieFrames(self.screen_dir+'/Screenshot.png')
+            self.win.saveMovieFrames(self.screen_dir+'/'+self.output_str+'_Screenshot.png')
             
         self.close()
 

@@ -74,6 +74,7 @@ class PRFTrial(Trial):
                              self.session.win.getMovieFrame()
                  else:
                      event_type = 'response'
+                     self.session.total_responses += 1
                      
                      #tracking percentage of correct responses per session
                      if self.session.current_dot_time==0:
