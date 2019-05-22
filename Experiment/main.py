@@ -12,14 +12,15 @@ from session import PRFSession
 
 def main():
     subject = sys.argv[1]
+    sess =  sys.argv[2]
     # 5 conditions: PRF2R, PRF1R, PRF1S, PRF4R, PRF4F 
     #(2 squares Regular speed, 1 square Regular, 1 square Slow, 4 square Regular, 4 square Fast)
-    task = sys.argv[2]
+    task = sys.argv[3]
     #in the full experiment we would do 3 runs
-    run = sys.argv[3]
+    run = sys.argv[4]
     
     
-    output_str= subject+'_task-'+task+'_run-'+run
+    output_str= subject+'_'+sess+'_'+task+'_'+run
     
     output_dir = './'+output_str+'_Logs'
     
@@ -27,7 +28,7 @@ def main():
         print("Warning: output directory already exists. Renaming to avoid overwriting.")
         output_dir = output_dir + '-redo'
     
-    settings_file='./expsettings_'+task+'.yml'
+    settings_file='./expsettings_'+task[5:]+'.yml'
 
     ts = PRFSession(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
     ts.run()

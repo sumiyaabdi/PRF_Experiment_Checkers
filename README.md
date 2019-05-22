@@ -7,7 +7,7 @@ Requirements: psychopy and exptools2
 
 Create setting files named expsettings_*Task*.yml within the Experiment folder. Change *Task* to your actual task name. Run the following line from within the Experient folder. 
 
-- python main.py Subject Task Run
+- python main.py sub-*xxx* ses-*x* task-*NameTask* run-*x*
 
 Subject SHOULD be specified according the the BIDS convention (sub-001, sub-002 and so on), Task MUST match one of the settings files in the Experiment folder, and Run SHOULD be an integer.
 
