@@ -8,7 +8,8 @@ Created on Mon Feb 25 14:04:44 2019
 import sys
 import os
 from session import PRFSession
-
+from datetime import datetime
+datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 def main():
     subject = sys.argv[1]
@@ -26,7 +27,7 @@ def main():
     
     if os.path.exists(output_dir):
         print("Warning: output directory already exists. Renaming to avoid overwriting.")
-        output_dir = output_dir + '-redo'
+        output_dir = output_dir + datetime.now().strftime('%Y%m%d%H%M%S')
     
     settings_file='./expsettings_'+task[5:]+'.yml'
 

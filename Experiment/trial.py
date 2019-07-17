@@ -8,6 +8,10 @@ Created on Mon Feb 25 14:06:36 2019
 
 from exptools2.core.trial import Trial
 from psychopy import event
+import numpy as np
+import os
+
+opj = os.path.join
 
 
 
@@ -37,7 +41,7 @@ class PRFTrial(Trial):
             
 
         super().__init__(session, trial_nr,
-            phase_durations,
+            phase_durations, verbose=False,
             *args,
             **kwargs)
 
@@ -54,9 +58,13 @@ class PRFTrial(Trial):
          events = event.getKeys(timeStamped=self.session.clock)
          if events:
              if 'q' in [ev[0] for ev in events]:  # specific key in settings?
+
+                 np.save(opj(self.session.output_dir, self.session.output_str+'_simple_response_data.npy'), {'Expected number of responses':len(self.session.dot_switch_color_times),
+                                                                                      'Total subject responses':self.session.total_responses,
+                                                                                      'Correct responses (within 0.8s of dot color change)':self.session.correct_responses})
                  
                  if self.session.settings['PRF stimulus settings']['Screenshot']==True:
-                     self.session.win.saveMovieFrames(self.session.screen_dir+'/Screenshot.png')
+                     self.session.win.saveMovieFrames(opj(self.session.screen_dir, self.session.output_str+'_Screenshot.png'))
                      
                  self.session.close()
                  self.session.quit()

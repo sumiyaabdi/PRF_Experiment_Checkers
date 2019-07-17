@@ -16,6 +16,8 @@ from exptools2.core.session import Session
 from trial import PRFTrial
 from stim import PRFStim
 
+opj = os.path.join
+
 
 
 class PRFSession(Session):
@@ -185,7 +187,7 @@ class PRFSession(Session):
         self.next_dot_time=1
 
         #only for testing purposes
-        np.save(self.output_dir+'/'+self.output_str+'_DotSwitchColorTimes.npy', self.dot_switch_color_times)
+        np.save(opj(self.output_dir, self.output_str+'_DotSwitchColorTimes.npy'), self.dot_switch_color_times)
         print(self.win.size)
 
     def draw_stimulus(self):
@@ -195,7 +197,6 @@ class PRFSession(Session):
         #present_trial_time = self.clock.getTime() - self.current_trial_start_time
         prf_time = present_time #/ (self.bar_step_length)
         
-        print(present_time)
   
         #draw the bar at the required orientation for this TR, unless the orientation is -1, code for a blank period
         if self.current_trial.bar_orientation != -1:
@@ -235,12 +236,15 @@ class PRFSession(Session):
         print('Expected number of responses: %d'%len(self.dot_switch_color_times))
         print('Total subject responses: %d'%self.total_responses)
         print('Correct responses (within 0.8s of dot color change): %d'%self.correct_responses)
+        np.save(opj(self.output_dir, self.output_str+'_simple_response_data.npy'), {'Expected number of responses':len(self.dot_switch_color_times),
+        														                      'Total subject responses':self.total_responses,
+        														                      'Correct responses (within 0.8s of dot color change)':self.correct_responses})
         
         #print('Percentage of correctly answered trials: %.2f%%'%(100*self.correct_responses/len(self.dot_switch_color_times)))
         
         
         if self.settings['PRF stimulus settings']['Screenshot']==True:
-            self.win.saveMovieFrames(self.screen_dir+'/'+self.output_str+'_Screenshot.png')
+            self.win.saveMovieFrames(opj(self.screen_dir, self.output_str+'_Screenshot.png'))
             
         self.close()
 
