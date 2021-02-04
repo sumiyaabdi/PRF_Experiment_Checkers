@@ -82,12 +82,18 @@ class PRFSession(Session):
                                 fringeWidth=0.02
                                 )
 
+        #adjust mask size in case the stimulus runs on a mac 
+        if self.settings['operating system'] == 'mac':
+            mask_size = [self.win.size[0]/2,self.win.size[1]/2]
+        else: 
+            mask_size = [self.win.size[0],self.win.size[1]]
+            
         self.mask_stim = visual.GratingStim(self.win, 
                                         mask=-mask, 
                                         tex=None, 
                                         units='pix',
                                         
-                                        size=[self.win.size[0],self.win.size[1]], 
+                                        size=mask_size, 
                                         pos = np.array((0.0,0.0)), 
                                         color = [0,0,0]) 
         
@@ -139,7 +145,11 @@ class PRFSession(Session):
         self.bar_orientation_at_TR = np.concatenate((-1*np.ones(5), np.repeat(bar_orientations, repeat_times)))
         
         
-        bar_pos_array = self.win.size[1]*np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass steps'])
+        #calculation of positions depend on whether code is run on mac
+        if self.settings['operating system'] == 'mac':
+            bar_pos_array = (self.win.size[1]/2)*np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass steps'])
+        else:
+            bar_pos_array = self.win.size[1]*np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass steps'])
         
         
         blank_array = np.zeros(self.settings['PRF stimulus settings']['Blanks length'])
@@ -179,7 +189,7 @@ class PRFSession(Session):
         
         
         #DOT COLOR CHANGE TIMES    
-        self.dot_switch_color_times = np.arange(3,self.total_time,3.5)
+        self.dot_switch_color_times = np.arange(3, self.total_time, float(self.settings['Task settings']['color switch interval']))
         self.dot_switch_color_times += (2*np.random.rand(len(self.dot_switch_color_times))-1)
         
         
@@ -234,12 +244,12 @@ class PRFSession(Session):
             self.current_trial_start_time = self.clock.getTime()
             self.current_trial.run()
         
-        print('Expected number of responses: %d'%len(self.dot_switch_color_times))
-        print('Total subject responses: %d'%self.total_responses)
-        print('Correct responses (within 0.8s of dot color change): %d'%self.correct_responses)
-        np.save(opj(self.output_dir, self.output_str+'_simple_response_data.npy'), {'Expected number of responses':len(self.dot_switch_color_times),
-        														                      'Total subject responses':self.total_responses,
-        														                      'Correct responses (within 0.8s of dot color change)':self.correct_responses})
+        print(f"Expected number of responses: {len(self.dot_switch_color_times)}")
+        print(f"Total subject responses: {self.total_responses}")
+        print(f"Correct responses (within {self.settings['Task settings']['response interval']}s of dot color change): {self.correct_responses}")
+        np.save(opj(self.output_dir, self.output_str+'_simple_response_data.npy'), {"Expected number of responses":len(self.dot_switch_color_times),
+        														                      "Total subject responses":self.total_responses,
+        														                      f"Correct responses (within {self.settings['Task settings']['response interval']}s of dot color change)":self.correct_responses})
         
         #print('Percentage of correctly answered trials: %.2f%%'%(100*self.correct_responses/len(self.dot_switch_color_times)))
         
