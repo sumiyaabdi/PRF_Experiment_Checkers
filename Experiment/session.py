@@ -122,6 +122,7 @@ class PRFSession(Session):
         #simple tools to check subject responses online
         self.correct_responses = 0
         self.total_responses = 0
+        self.dot_count = 0
         
         bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         #create as many trials as TRs. 5 extra TRs at beginning + bar passes + blanks
