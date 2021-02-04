@@ -49,7 +49,7 @@ class PRFTrial(Trial):
     def draw(self, *args, **kwargs):
         # draw bar stimulus and circular (raised cosine) aperture from Session class
         self.session.draw_stimulus() 
-        self.session.mask_stim.draw()
+        # self.session.mask_stim.draw()
         
         
         
@@ -84,18 +84,16 @@ class PRFTrial(Trial):
                      event_type = 'response'
                      self.session.total_responses += 1
                      
-                     #tracking percentage of correct responses per session
-                     if self.session.current_dot_time==0:
-                         if t>self.session.dot_switch_color_times[0] and t<self.session.dot_switch_color_times[0] + 0.8:
-                             self.session.correct_responses += 1
-                     else:
-                         if t>self.session.dot_switch_color_times[self.session.current_dot_time] and t<self.session.dot_switch_color_times[self.session.current_dot_time] + 0.8:
-                             self.session.correct_responses += 1
-                             
-                         elif t>self.session.dot_switch_color_times[self.session.next_dot_time] and t<self.session.dot_switch_color_times[self.session.next_dot_time] + 0.8:
-                             self.session.correct_responses += 1
-                             
-
+                     # #tracking percentage of correct responses per session
+                     # if self.session.current_dot_time==0:
+                     #     if t>self.session.dot_switch_color_times[0] and t<self.session.dot_switch_color_times[0] + 0.8:
+                     #         self.session.correct_responses += 1
+                     # else:
+                     #     if t>self.session.dot_switch_color_times[self.session.current_dot_time] and t<self.session.dot_switch_color_times[self.session.current_dot_time] + 0.8:
+                     #         self.session.correct_responses += 1
+                     #
+                     #     elif t>self.session.dot_switch_color_times[self.session.next_dot_time] and t<self.session.dot_switch_color_times[self.session.next_dot_time] + 0.8:
+                     #         self.session.correct_responses += 1
 
  
                  idx = self.session.global_log.shape[0]

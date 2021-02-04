@@ -29,7 +29,8 @@ def main():
         print("Warning: output directory already exists. Renaming to avoid overwriting.")
         output_dir = output_dir + datetime.now().strftime('%Y%m%d%H%M%S')
     
-    settings_file='./expsettings_'+task[5:]+'.yml'
+    settings_file='expsettings/expsettings_'+task+'.yml'
+    # settings_file = 'expsettings/expsettings_attn.yml'
 
     ts = PRFSession(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
     ts.run()

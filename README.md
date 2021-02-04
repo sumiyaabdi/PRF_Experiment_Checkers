@@ -22,3 +22,7 @@ The Experiment folder contains 5 setting files, which can be used as examples. T
 - 1S: 1 square, Slow speed (40TR bar passes, half the normal speed)
 
 Note that the actual task (fixation dot color discrimination) is identical in all 5 cases.
+
+## Sumiya's Notes
+- Press q to quit 
+- Press t to pass **Waiting for scanner** screen

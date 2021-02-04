@@ -6,9 +6,130 @@ Created on Mon Feb 25 14:07:02 2019
 @author: marcoaqil
 """
 import numpy as np
-from psychopy import visual
-from psychopy import tools
+from psychopy import visual, tools
 
+
+def cross_fixation(win, size=0.1, color=(1,1,1), **kwargs):
+    """ Creates a fixation cross with sensible defaults. """
+    return visual.ShapeStim(win, lineColor=None, fillColor=color, vertices='cross', size=size)
+
+class FixationStim():
+    """
+    Small attention field task. Creates fixation color discrimination task, participant responds
+    when fixation dot color changes from gray [0,0,0].
+    """
+    def __init__(self, session):
+        self.session = session
+
+    def draw(self, color=0, radius=0.1):
+        self.color = [color]*3 # turns into RGN array
+        self.radius = radius
+        self.stim = visual.Circle(self.session.win, lineColor='black', radius=radius,
+                             fillColor=self.color, edges=100)
+        self.stim.draw()
+
+class AttSizeStim():
+    """
+    Large attention field task. Creates field for pink and blue dots, participant responds when
+    proportion of dots changes from 50/50.
+    """
+    def __init__(self,
+                 session,
+                 n_sections=1,
+                 ecc_min=0,
+                 ecc_max=2,
+                 n_rings=50,
+                 row_spacing_factor=0.8,
+                 opacity=0.2,
+                 draw_ring=False,
+                 color_balance = 0.5,
+                 **kwargs):
+
+        self.session = session
+        self.n_sections = n_sections
+        # self.ecc_min = ecc_min
+        # self.ecc_max = ecc_max
+        # self.n_rings = n_rings
+        # self.row_spacing_factor
+        self.opacity = opacity
+        self.draw_ring = draw_ring
+        self.color1 = [-0.8, 0.18, 1]
+        self.color2 = [1, -1, 1]
+        self.color_balance = color_balance
+
+        total_rings = self.n_sections * (n_rings + 1) + 1
+
+        # eccentricities for each ring of dots in degrees
+        if ecc_min != 0:
+            ring_eccs = np.linspace(ecc_min, ecc_max, total_rings, endpoint=True)
+        else:
+            ring_eccs = np.linspace(ecc_min, ecc_max, total_rings, endpoint=True)[1:] # remove centre dot if min ecc is 0
+
+        # section positions
+        section_positions = np.arange(0, total_rings, n_rings + 1)
+        ring_sizes = np.diff(ring_eccs)
+        blob_sizes = ring_sizes * row_spacing_factor
+
+        circles_per_ring = ((2 * np.pi * ring_eccs[1:]) / ring_sizes).astype(int)
+
+        element_array_np = []
+        ring_nr = 1
+
+        for ecc, cpr, s in zip(ring_eccs[:], circles_per_ring[:], blob_sizes[:]):
+            if not ring_nr in section_positions:
+                ring_condition = np.floor(n_sections * ring_nr / total_rings)
+                for pa in np.linspace(0, 2 * np.pi, cpr, endpoint=False):
+                    x, y = tools.coordinatetools.pol2cart(pa, ecc, units=None)
+                    element_array_np.append([self.session.pixels_per_degree * x,
+                                             self.session.pixels_per_degree * y,
+                                             ecc,
+                                             pa,
+                                             self.session.pixels_per_degree * s,
+                                             1, 1, 1, 0.2, ring_nr, ring_condition])
+            ring_nr += 1
+
+            self.element_array_np = np.array(element_array_np)
+
+            self.element_array_stim = visual.ElementArrayStim(self.session.win,
+                                                              colors=self.element_array_np[:, [5, 6, 7]],
+                                                              colorSpace='rgb',
+                                                              nElements=self.element_array_np.shape[0],
+                                                              sizes=self.element_array_np[:, 4],
+                                                              sfs=0,
+                                                              opacities=self.opacity,
+                                                              xys=self.element_array_np[:, [0, 1]])
+
+            # self.repopulate_condition_ring_colors(condition_nr=0, color_balance=color_balance)
+
+    def repopulate_condition_ring_colors(self, condition_nr, color_balance):
+        this_ring_bool = self.element_array_np[:, -1] == condition_nr
+        nr_elements_in_condition = this_ring_bool.sum()
+
+        nr_signal_elements = int(nr_elements_in_condition * color_balance)
+        ordered_signals = np.r_[np.ones((nr_signal_elements,3)) * self.color1,
+                                np.ones((nr_elements_in_condition - nr_signal_elements,3)) * self.color2]
+
+        # np.random.shuffle(ordered_signals)
+
+        # self.element_array_np[this_ring_bool, 5:8] = ordered_signals
+        # self.element_array_stim.setXYs(self.element_array_np[:, [0, 1]], log=False)
+        # self.element_array_stim.setColors(self.element_array_np[:, [5, 6, 7]], log=False)
+        self.element_array_stim.setColors(ordered_signals, log=False)
+
+    # def recalculate_elements(self):
+    #     pass
+
+
+    def draw(self):
+        self.element_array_stim.draw()
+
+        if self.draw_ring:
+            self.ring = visual.Circle(self.session.win,
+                                      radius=ring_eccs[-1] * self.session.pixels_per_degree,
+                                      lineColor=[-1, -1, -1],
+                                      edges=256,
+                                      opacity=0.1)
+            self.ring.draw()
 
 class PRFStim(object):  
     def __init__(self, session, 
@@ -116,17 +237,17 @@ class PRFStim(object):
             
 
         
-    #this is the function that actually draws the stimulus. the sequence of different textures gives the illusion of motion.
+    # this is the function that actually draws the stimulus. the sequence of different textures gives the illusion of motion.
     def draw(self, time, pos_in_ori, orientation,  bar_direction):
         
-        #calculate position of the bar in relation to its orientation
+        # calculate position of the bar in relation to its orientation
         x_pos, y_pos = np.cos((2.0*np.pi)*-orientation/360.0)*pos_in_ori, np.sin((2.0*np.pi)*-orientation/360.0)*pos_in_ori
         
-        #convert current time to sine/cosine to decide which texture to draw
+        # convert current time to sine/cosine to decide which texture to draw
         sin = np.sin(2*np.pi*time*self.flicker_frequency)
         cos = np.cos(2*np.pi*time*self.flicker_frequency)
 
-        #set position, orientation, texture, and draw bar. bar moving up or down simply has reversed order of presentation
+        # set position, orientation, texture, and draw bar. bar moving up or down simply has reversed order of presentation
         if bar_direction==0:
             if sin > 0 and cos > 0 and cos > sin:
                 self.checkerboard_1.setPos([x_pos, y_pos])
