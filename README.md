@@ -24,6 +24,7 @@ The Experiment folder contains 5 setting files, which can be used as examples. T
 Note that the actual task (fixation dot color discrimination) is identical in all 5 cases.
 
 **Settings file** 
+
 In the settings file you should specify the *operating system* that the code is running on, as "operating system: *your OS*" as 'mac', 'linux' or 'windows'
 This is mainly important if you run the stimulus on a mac, as the size of the stimulus needs to be adjusted in that case.
 
