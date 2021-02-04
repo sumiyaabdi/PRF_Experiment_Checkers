@@ -54,66 +54,64 @@ class PRFTrial(Trial):
         
         
     def get_events(self):
-         """ Logs responses/triggers """
-         events = event.getKeys(timeStamped=self.session.clock)
-         if events:
-             if 'q' in [ev[0] for ev in events]:  # specific key in settings?
+        """ Logs responses/triggers """
+        events = event.getKeys(timeStamped=self.session.clock)
+        if events:
+            if 'q' in [ev[0] for ev in events]:  # specific key in settings?
 
-                 np.save(opj(self.session.output_dir, self.session.output_str+'_simple_response_data.npy'), {'Expected number of responses':len(self.session.dot_switch_color_times),
-                                                                                      'Total subject responses':self.session.total_responses,
-                                                                                      'Correct responses (within 0.8s of dot color change)':self.session.correct_responses})
+                np.save(opj(self.session.output_dir, self.session.output_str+'_simple_response_data.npy'), {'Expected number of responses':len(self.session.dot_switch_color_times),
+                                                                                     'Total subject responses':self.session.total_responses,
+                                                                                     'Correct responses (within 0.8s of dot color change)':self.session.correct_responses})
                  
-                 if self.session.settings['PRF stimulus settings']['Screenshot']==True:
-                     self.session.win.saveMovieFrames(opj(self.session.screen_dir, self.session.output_str+'_Screenshot.png'))
+                if self.session.settings['PRF stimulus settings']['Screenshot']==True:
+                    self.session.win.saveMovieFrames(opj(self.session.screen_dir, self.session.output_str+'_Screenshot.png'))
                      
-                 self.session.close()
-                 self.session.quit()
+                self.session.close()
+                self.session.quit()
  
-             for key, t in events:
+            for key, t in events:
  
-                 if key == self.session.mri_trigger:
-                     event_type = 'pulse'
-                     #marco edit. the second bit is a hack to avoid double-counting of the first t when simulating a scanner
-                     if self.session.settings['PRF stimulus settings']['Scanner sync']==True and t>0.1:                       
-                         self.exit_phase=True
-                         #ideally, for speed, would want  getMovieFrame to be called right after the first winflip. 
-                         #but this would have to be dun from inside trial.run()
-                         if self.session.settings['PRF stimulus settings']['Screenshot']==True:
-                             self.session.win.getMovieFrame()
-                 else:
-                     event_type = 'response'
-                     self.session.total_responses += 1
+                if key == self.session.mri_trigger:
+                    event_type = 'pulse'
+                    #marco edit. the second bit is a hack to avoid double-counting of the first t when simulating a scanner
+                    if self.session.settings['PRF stimulus settings']['Scanner sync']==True and t>0.1:                       
+                        self.exit_phase=True
+                        #ideally, for speed, would want  getMovieFrame to be called right after the first winflip. 
+                        #but this would have to be dun from inside trial.run()
+                        if self.session.settings['PRF stimulus settings']['Screenshot']==True:
+                            self.session.win.getMovieFrame()
+                else:
+                    event_type = 'response'
+                    self.session.total_responses += 1
                      
-                     #tracking percentage of correct responses per session
-                     if self.session.current_dot_time==0:
-                         if t>self.session.dot_switch_color_times[0] and t<self.session.dot_switch_color_times[0] + 0.8:
-                             self.session.correct_responses += 1
-                     else:
-                         if t>self.session.dot_switch_color_times[self.session.current_dot_time] and t<self.session.dot_switch_color_times[self.session.current_dot_time] + 0.8:
-                             self.session.correct_responses += 1
-                             
-                         elif t>self.session.dot_switch_color_times[self.session.next_dot_time] and t<self.session.dot_switch_color_times[self.session.next_dot_time] + 0.8:
-                             self.session.correct_responses += 1
+                    #tracking percentage of correct responses per session
+                    if t > self.session.dot_switch_color_times[self.session.dot_count] and t < self.session.dot_switch_color_times[self.session.dot_count] + 0.8:
+                        self.session.correct_responses +=1 
+                        # print(f'number correct responses: {self.session.correct_responses}') #testing
                              
 
 
  
-                 idx = self.session.global_log.shape[0]
-                 self.session.global_log.loc[idx, 'trial_nr'] = self.trial_nr
-                 self.session.global_log.loc[idx, 'onset'] = t
-                 self.session.global_log.loc[idx, 'event_type'] = event_type
-                 self.session.global_log.loc[idx, 'phase'] = self.phase
-                 self.session.global_log.loc[idx, 'response'] = key
+                idx = self.session.global_log.shape[0]
+                self.session.global_log.loc[idx, 'trial_nr'] = self.trial_nr
+                self.session.global_log.loc[idx, 'onset'] = t
+                self.session.global_log.loc[idx, 'event_type'] = event_type
+                self.session.global_log.loc[idx, 'phase'] = self.phase
+                self.session.global_log.loc[idx, 'response'] = key
  
-                 for param, val in self.parameters.items():
-                     self.session.global_log.loc[idx, param] = val
+                for param, val in self.parameters.items():
+                    self.session.global_log.loc[idx, param] = val
  
-                 #self.trial_log['response_key'][self.phase].append(key)
-                 #self.trial_log['response_onset'][self.phase].append(t)
-                 #self.trial_log['response_time'][self.phase].append(t - self.start_trial)
+                #self.trial_log['response_key'][self.phase].append(key)
+                #self.trial_log['response_onset'][self.phase].append(t)
+                #self.trial_log['response_time'][self.phase].append(t - self.start_trial)
  
-                 if key != self.session.mri_trigger:
-                     self.last_resp = key
-                     self.last_resp_onset = t
+                if key != self.session.mri_trigger:
+                    self.last_resp = key
+                    self.last_resp_onset = t
         
+        #update counter
+        if self.session.clock.getTime() > self.session.dot_switch_color_times[self.session.dot_count] + 0.9: #to give time to respond
+            self.session.dot_count += 1   
+            # print(f'dot count: {self.session.dot_count}') #testing
     
