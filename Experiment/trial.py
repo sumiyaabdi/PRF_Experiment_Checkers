@@ -59,10 +59,10 @@ class PRFTrial(Trial):
         if events:
             if 'q' in [ev[0] for ev in events]:  # specific key in settings?
 
-                np.save(opj(self.session.output_dir, self.session.output_str+'_simple_response_data.npy'), {'Expected number of responses':len(self.session.dot_switch_color_times),
-                                                                                     'Total subject responses':self.session.total_responses,
-                                                                                     'Correct responses (within 0.8s of dot color change)':self.session.correct_responses})
-                 
+                np.save(opj(self.session.output_dir, self.session.output_str+'_simple_response_data.npy'), {"Expected number of responses":len(self.session.dot_switch_color_times),
+                                                                                  "Total subject responses":self.session.total_responses,
+                                                                                  f"Correct responses (within {self.session.settings['Task settings']['response interval']}s of dot color change)":self.session.correct_responses})
+           
                 if self.session.settings['PRF stimulus settings']['Screenshot']==True:
                     self.session.win.saveMovieFrames(opj(self.session.screen_dir, self.session.output_str+'_Screenshot.png'))
                      
@@ -85,7 +85,8 @@ class PRFTrial(Trial):
                     self.session.total_responses += 1
                      
                     #tracking percentage of correct responses per session
-                    if t > self.session.dot_switch_color_times[self.session.dot_count] and t < self.session.dot_switch_color_times[self.session.dot_count] + 0.8:
+                    if t > self.session.dot_switch_color_times[self.session.dot_count] and \
+                        t < self.session.dot_switch_color_times[self.session.dot_count] + float(self.session.settings['Task settings']['response interval']):
                         self.session.correct_responses +=1 
                         # print(f'number correct responses: {self.session.correct_responses}') #testing
                              
@@ -111,7 +112,8 @@ class PRFTrial(Trial):
                     self.last_resp_onset = t
         
         #update counter
-        if self.session.clock.getTime() > self.session.dot_switch_color_times[self.session.dot_count] + 0.9: #to give time to respond
+        if self.session.clock.getTime() > self.session.dot_switch_color_times[self.session.dot_count] + \
+            float(self.session.settings['Task settings']['response interval'])+0.1: #to give time to respond
             self.session.dot_count += 1   
             # print(f'dot count: {self.session.dot_count}') #testing
     
