@@ -221,17 +221,18 @@ class PRFSession(Session):
         #present_trial_time = self.clock.getTime() - self.current_trial_start_time
         prf_time = present_time #/ (self.bar_step_length)
 
+        # draw the bar at the required orientation for this TR, unless the orientation is -1, code for a blank period
+        if self.current_trial.bar_orientation != -1:
+            self.prf_stim.draw(time=prf_time,
+                               pos_in_ori=self.current_trial.bar_position_in_ori,
+                               orientation=self.current_trial.bar_orientation,
+                               bar_direction=self.current_trial.bar_direction)
 
         self.largeAF.draw()
         self.smallAF.draw(self.fix_colors[self.current_trial.ID],
                           radius=self.settings['fixation stim'].get('radius'))
   
-        #draw the bar at the required orientation for this TR, unless the orientation is -1, code for a blank period
-        if self.current_trial.bar_orientation != -1:
-            self.prf_stim.draw(time=prf_time, 
-                               pos_in_ori=self.current_trial.bar_position_in_ori, 
-                               orientation=self.current_trial.bar_orientation,
-                               bar_direction=self.current_trial.bar_direction)
+
 
     def run(self):
         """run the session"""
