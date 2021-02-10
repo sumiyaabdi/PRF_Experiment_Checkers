@@ -85,10 +85,11 @@ class PRFTrial(Trial):
                     self.session.total_responses += 1
                      
                     #tracking percentage of correct responses per session
-                    if t > self.session.dot_switch_color_times[self.session.dot_count] and \
-                        t < self.session.dot_switch_color_times[self.session.dot_count] + float(self.session.settings['Task settings']['response interval']):
-                        self.session.correct_responses +=1 
-                        # print(f'number correct responses: {self.session.correct_responses}') #testing
+                    if self.session.dot_count < len(self.session.dot_switch_color_times): 
+                        if t > self.session.dot_switch_color_times[self.session.dot_count] and \
+                            t < self.session.dot_switch_color_times[self.session.dot_count] + float(self.session.settings['Task settings']['response interval']):
+                            self.session.correct_responses +=1 
+                            # print(f'number correct responses: {self.session.correct_responses}') #testing
                              
 
 
@@ -112,8 +113,9 @@ class PRFTrial(Trial):
                     self.last_resp_onset = t
         
         #update counter
-        if self.session.clock.getTime() > self.session.dot_switch_color_times[self.session.dot_count] + \
-            float(self.session.settings['Task settings']['response interval'])+0.1: #to give time to respond
-            self.session.dot_count += 1   
-            # print(f'dot count: {self.session.dot_count}') #testing
+        if self.session.dot_count < len(self.session.dot_switch_color_times): 
+            if self.session.clock.getTime() > self.session.dot_switch_color_times[self.session.dot_count] + \
+                float(self.session.settings['Task settings']['response interval'])+0.1: #to give time to respond
+                self.session.dot_count += 1   
+                # print(f'dot count: {self.session.dot_count}') #testing
     
