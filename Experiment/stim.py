@@ -40,22 +40,16 @@ class AttSizeStim():
                  ecc_max=2,
                  n_rings=50,
                  row_spacing_factor=0.8,
-                 opacity=0.2,
+                 opacity=0.1,
                  draw_ring=False,
-                 color_balance = 0.5,
                  **kwargs):
 
         self.session = session
         self.n_sections = n_sections
-        # self.ecc_min = ecc_min
-        # self.ecc_max = ecc_max
-        # self.n_rings = n_rings
-        # self.row_spacing_factor
         self.opacity = opacity
         self.draw_ring = draw_ring
-        self.color1 = [-0.8, 0.18, 1]
-        self.color2 = [1, -1, 1]
-        self.color_balance = color_balance
+        self.color1 = [-0.8, 0.18, 1] # (x+1)/2 : 0.1,0.59,1
+        self.color2 = [1, -1, 0.4] # 1,0,1
 
         total_rings = self.n_sections * (n_rings + 1) + 1
 
@@ -99,28 +93,30 @@ class AttSizeStim():
                                                               opacities=self.opacity,
                                                               xys=self.element_array_np[:, [0, 1]])
 
-            # self.repopulate_condition_ring_colors(condition_nr=0, color_balance=color_balance)
+        # intialize array of color orders for each trial
+        n_elements =  sum(self.element_array_np[:, -1] == 0)
 
-    def repopulate_condition_ring_colors(self, condition_nr, color_balance):
-        this_ring_bool = self.element_array_np[:, -1] == condition_nr
+        self.color_orders = []
+        for i in range(session.n_trials):
+            i = np.arange(n_elements)
+            np.random.shuffle(i)
+            self.color_orders.append(i)
+
+        self.color_orders = np.array(self.color_orders)
+
+
+    def draw(self, color_balance, trial_nr):
+        this_ring_bool = self.element_array_np[:, -1] == 0
         nr_elements_in_condition = this_ring_bool.sum()
 
         nr_signal_elements = int(nr_elements_in_condition * color_balance)
-        ordered_signals = np.r_[np.ones((nr_signal_elements,3)) * self.color1,
-                                np.ones((nr_elements_in_condition - nr_signal_elements,3)) * self.color2]
+        ordered_signals = np.r_[np.ones((nr_signal_elements, 3)) * self.color1,
+                                np.ones((nr_elements_in_condition - nr_signal_elements, 3)) * self.color2]
+        ordered_signals = ordered_signals[self.color_orders][trial_nr, :]
 
-        # np.random.shuffle(ordered_signals)
-
-        # self.element_array_np[this_ring_bool, 5:8] = ordered_signals
-        # self.element_array_stim.setXYs(self.element_array_np[:, [0, 1]], log=False)
-        # self.element_array_stim.setColors(self.element_array_np[:, [5, 6, 7]], log=False)
+        self.element_array_np[this_ring_bool, 5:8] = ordered_signals
         self.element_array_stim.setColors(ordered_signals, log=False)
 
-    # def recalculate_elements(self):
-    #     pass
-
-
-    def draw(self):
         self.element_array_stim.draw()
 
         if self.draw_ring:

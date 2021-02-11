@@ -26,7 +26,8 @@ opj = os.path.join
 
 class PRFSession(Session):
 
-    def __init__(self, output_str, output_dir, settings_file):
+    def __init__(self, output_str, output_dir, settings_file, macbook_bool=True):
+
         """
 
         Parameters
@@ -43,7 +44,22 @@ class PRFSession(Session):
         self.pixels_per_degree = 8
         self.fix_color_default = self.settings['fixation stim']['default_color']
         self.fix_range = self.settings['fixation stim']['color_range']
-        # self.trial_number = n_trials
+        self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
+        self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
+                        * len(np.where(self.bar_orientations != -1)[0]) \
+                        + self.settings['PRF stimulus settings']['Blanks length'] \
+                        * len(np.where(self.bar_orientations == -1)[0])
+        self.trials = []
+
+        # set size of display
+        if self.settings['window']['display'] == 'square':
+            self.screen = np.array([self.win.size[1], self.win.size[1]])
+
+        elif self.settings['window']['display'] == 'rectangle':
+            self.screen = np.array([self.win.size[0], self.win.size[1]])
+
+        if macbook_bool:  # to compensate for macbook retina display
+            self.screen = self.screen / 2
 
 
         #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
@@ -62,11 +78,6 @@ class PRFSession(Session):
             self.screen_dir=output_dir+'/'+output_str+'_Screenshots'
             if not os.path.exists(self.screen_dir):
                 os.mkdir(self.screen_dir)
-            
-
-        #create all stimuli and trials at the beginning of the experiment, to save time and resources        
-        self.create_stimuli()
-        self.create_trials()
 
 
     def create_stimuli(self):
@@ -76,12 +87,16 @@ class PRFSession(Session):
                         squares_in_bar=self.settings['PRF stimulus settings']['Squares in bar'], 
                         bar_width_deg=self.settings['PRF stimulus settings']['Bar width in degrees'],
                         flicker_frequency=self.settings['PRF stimulus settings']['Checkers motion speed'])#self.deg2pix(self.settings['prf_max_eccentricity']))    
-        
+
+        if self.settings['operating system'] == 'mac':
+            mask_size = [self.win.size[0]/2,self.win.size[1]/2]
+        else:
+            mask_size = [self.win.size[0],self.win.size[1]]
 
         #generate raised cosine alpha mask
-        mask = filters.makeMask(matrixSize=self.win.size[0], 
+        mask = filters.makeMask(matrixSize=self.screen[0],
                                 shape='raisedCosine', 
-                                radius=np.array([self.win.size[1]/self.win.size[0], 1.0]),
+                                radius=np.array([self.screen[1]/self.screen[0], 1.0]),
                                 center=(0.0, 0.0), 
                                 range=[-1, 1], 
                                 fringeWidth=0.02
@@ -91,8 +106,7 @@ class PRFSession(Session):
                                         mask=-mask, 
                                         tex=None, 
                                         units='pix',
-                                        
-                                        size=[self.win.size[0],self.win.size[1]], 
+                                        size=mask_size,
                                         pos = np.array((0.0,0.0)), 
                                         color = [0,0,0])
 
@@ -102,11 +116,13 @@ class PRFSession(Session):
                                    ecc_max=self.settings['attn stim']['max eccentricity'],
                                    n_rings=self.settings['attn stim']['number of rings'],
                                    row_spacing_factor=self.settings['attn stim']['row spacing factor'],
-                                   opacity=self.settings['attn stim']['opacity'],
-                                   color_balance=self.default_balance)
+                                   opacity=self.settings['attn stim']['opacity'])
+        print(f'COLOR_ORDERS: {self.largeAF.color_orders}')
+
 
         self.smallAF = FixationStim(self)
         self.cross_fix = cross_fixation(self.win, 0.2, (-1, -1, -1), opacity=0.5)
+
 
     #         #as current basic task, generate fixation circles of different colors, with black border
 #
@@ -134,77 +150,76 @@ class PRFSession(Session):
         create bar orientation list at each TR (this can be done in many different ways according to necessity)
         for example, currently blank periods have same length as bar passes. this can easily be changed here"""
 
-        self.trials=[]
         self.correct_responses = 0
         self.total_responses = 0
-        
-        bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
-        self.trial_number = 5 + self.settings['PRF stimulus settings']['Bar pass steps']*len(np.where(bar_orientations != -1)[0]) + self.settings['PRF stimulus settings']['Blanks length']*len(np.where(bar_orientations == -1)[0])
-  
-        print("Expected number of TRs: %d"%self.trial_number)
 
-        steps_array=self.settings['PRF stimulus settings']['Bar pass steps']*np.ones(len(bar_orientations))
-        blanks_array=self.settings['PRF stimulus settings']['Blanks length']*np.ones(len(bar_orientations))
-        repeat_times=np.where(bar_orientations == -1, blanks_array, steps_array).astype(int)
-        self.bar_orientation_at_TR = np.concatenate((-1*np.ones(5), np.repeat(bar_orientations, repeat_times)))
-        bar_pos_array = self.win.size[1]*np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass steps'])
+        self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps']*len(np.where(self.bar_orientations != -1)[0]) + self.settings['PRF stimulus settings']['Blanks length']*len(np.where(self.bar_orientations == -1)[0])
+
+        print("Expected number of TRs: %d"%self.n_trials)
+
+        steps_array=self.settings['PRF stimulus settings']['Bar pass steps']*np.ones(len(self.bar_orientations))
+        blanks_array=self.settings['PRF stimulus settings']['Blanks length']*np.ones(len(self.bar_orientations))
+        repeat_times=np.where(self.bar_orientations == -1, blanks_array, steps_array).astype(int)
+        self.bar_orientation_at_TR = np.concatenate((-1*np.ones(5), np.repeat(self.bar_orientations, repeat_times)))
+        bar_pos_array = self.screen[1]*np.linspace(-0.5,0.5, self.settings['PRF stimulus settings']['Bar pass steps'])
         blank_array = np.zeros(self.settings['PRF stimulus settings']['Blanks length'])
         
         #the 5 empty trials at beginning
         self.bar_pos_in_ori=np.zeros(5)
         
         #bar position at TR
-        for i in range(len(bar_orientations)):
-            if bar_orientations[i]==-1:
+        for i in range(len(self.bar_orientations)):
+            if self.bar_orientations[i]==-1:
                 self.bar_pos_in_ori=np.append(self.bar_pos_in_ori, blank_array)
             else:
                 self.bar_pos_in_ori=np.append(self.bar_pos_in_ori, bar_pos_array)
      
         #random bar direction at each step. could also make this time-based
-        self.bar_direction_at_TR = np.round(np.random.rand(self.trial_number))
+        self.bar_direction_at_TR = np.round(np.random.rand(self.n_trials))
 
-        # trial list
-        for i in range(self.trial_number):
-            self.trials.append(PRFTrial(session=self,
-                                        trial_nr=i,
 
-                                        bar_orientation=self.bar_orientation_at_TR[i],
-                                        bar_position_in_ori=self.bar_pos_in_ori[i],
-                                        bar_direction=self.bar_direction_at_TR[i]
-                                        # ,tracker=self.tracker
-                                        ))
 
         ### attn trial details ###
-        signal = self.trial_number / 3
+        signal = self.n_trials / 3
 
         # create list of color balances for large AF trials
         self.color_balances = np.r_[np.ones(int(signal / 2)) * self.default_balance + self.color_range,
                                     np.ones(int(signal / 2)) * self.default_balance - self.color_range,
-                                    np.ones(int(self.trial_number - signal)) * self.default_balance]
+                                    np.ones(int(self.n_trials - signal)) * self.default_balance]
 
-        while len(self.color_balances) != self.trial_number:
+        while len(self.color_balances) != self.n_trials:
             self.color_balances = np.append(self.color_balances, self.default_balance)
 
         np.random.shuffle(self.color_balances)
 
         # create list of fixation colors for each trial in small AF task
-        self.fix_colors = np.r_[np.ones(int(self.trial_number - signal)) * self.fix_color_default,
+        self.fix_colors = np.r_[np.ones(int(self.n_trials - signal)) * self.fix_color_default,
                                 np.ones(int(signal / 2)) * self.fix_range,
                                 np.ones(int(signal / 2)) * -1 * self.fix_range]
 
-        while len(self.fix_colors) != self.trial_number:
+        while len(self.fix_colors) != self.n_trials:
             self.fix_colors = np.append(self.fix_colors, self.fix_color_default)
 
         np.random.shuffle(self.fix_colors)
 
+        # trial list
+        for i in range(self.n_trials):
+            self.trials.append(PRFTrial(session=self,
+                                        trial_nr=i,
 
-        #times for dot color change. continue the task into the topup
-        self.total_time = self.trial_number*self.bar_step_length 
-        
-        if self.settings['mri']['topup_scan']==True:
+                                        bar_orientation=self.bar_orientation_at_TR[i],
+                                        bar_position_in_ori=self.bar_pos_in_ori[i],
+                                        bar_direction=self.bar_direction_at_TR[i],
+                                        color_balance=self.color_balances[i]
+                                        # ,tracker=self.tracker
+                                        ))
+
+        # times for dot color change. continue the task into the topup
+        self.total_time = self.n_trials * self.bar_step_length
+
+        if self.settings['mri']['topup_scan'] == True:
             self.total_time += self.topup_scan_duration
-        
-        
+
         # #DOT COLOR CHANGE TIMES
         # self.dot_switch_color_times = np.arange(3,self.total_time,3.5)
         # self.dot_switch_color_times += (2*np.random.rand(len(self.dot_switch_color_times))-1)
@@ -228,8 +243,8 @@ class PRFSession(Session):
                                orientation=self.current_trial.bar_orientation,
                                bar_direction=self.current_trial.bar_direction)
 
-        self.largeAF.draw()
-        self.smallAF.draw(self.fix_colors[self.current_trial.ID],
+        self.largeAF.draw(self.current_trial.color_balance, self.current_trial.trial_nr)
+        self.smallAF.draw(self.fix_colors[self.current_trial.trial_nr],
                           radius=self.settings['fixation stim'].get('radius'))
   
 
@@ -245,7 +260,7 @@ class PRFSession(Session):
             self.current_trial = self.trials[trial_idx]
             self.current_trial_start_time = self.clock.getTime()
             self.current_trial.run()
-            print(f'CURRENT TRIAL: {self.current_trial.ID}')
+            print(f'CURRENT TRIAL: {self.current_trial.trial_nr}')
         
         print('Expected number of responses: %d'%len(self.dot_switch_color_times))
         print('Total subject responses: %d'%self.total_responses)

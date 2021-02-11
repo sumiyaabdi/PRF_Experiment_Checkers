@@ -33,6 +33,8 @@ def main():
     # settings_file = 'expsettings/expsettings_attn.yml'
 
     ts = PRFSession(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+    ts.create_stimuli()
+    ts.create_trials()
     ts.run()
 
 if __name__ == '__main__':

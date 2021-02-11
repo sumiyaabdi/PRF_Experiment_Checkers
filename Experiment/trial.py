@@ -17,38 +17,43 @@ opj = os.path.join
 
 class PRFTrial(Trial):
 
-    def __init__(self, session, trial_nr, bar_orientation, bar_position_in_ori, bar_direction, *args, **kwargs):
-        
-        #trial number and bar parameters   
-        self.ID = trial_nr
-        self.bar_orientation = bar_orientation
-        self.bar_position_in_ori = bar_position_in_ori
-        self.bar_direction = bar_direction
-        self.session=session
-
-        #here we decide how to go from each trial (bar position) to the next.    
-        if self.session.settings['PRF stimulus settings']['Scanner sync']==True:
-            #dummy value: if scanning or simulating a scanner, everything is synced to the output 't' of the scanner
-            phase_durations = [100]
-        else:
-            #if not synced to a real or simulated scanner, take the bar pass step as length
-            phase_durations = [self.session.settings['PRF stimulus settings']['Bar step length']] 
-            
-        #add topup time to last trial
-        if self.session.settings['mri']['topup_scan']==True:
-            if self.ID == self.session.trial_number-1:
-                phase_durations=[self.session.topup_scan_duration]
-            
+    def __init__(self, session, trial_nr, bar_orientation, bar_position_in_ori,
+                 bar_direction, color_balance, phase_durations=(0.3,0.4), *args, **kwargs):
 
         super().__init__(session, trial_nr,
             phase_durations, verbose=False,
             *args,
             **kwargs)
 
+        #trial number and bar parameters   
+        self.bar_orientation = bar_orientation
+        self.bar_position_in_ori = bar_position_in_ori
+        self.bar_direction = bar_direction
+        self.color_balance = color_balance
+
+        #here we decide how to go from each trial (bar position) to the next.    
+        if self.session.settings['PRF stimulus settings']['Scanner sync']==True:
+            #dummy value: if scanning or simulating a scanner, everything is synced to the output 't' of the scanner
+            self.phase_durations = [100]
+        else:
+            #if not synced to a real or simulated scanner, take the bar pass step as length
+            self.phase_durations = [self.session.settings['PRF stimulus settings']['Bar step length']]
+            
+        #add topup time to last trial
+        if self.session.settings['mri']['topup_scan']==True:
+            if self.trial_nr == self.session.n_trials-1:
+                self.phase_durations=[self.session.topup_scan_duration]
+
     
     def draw(self, *args, **kwargs):
         # draw bar stimulus and circular (raised cosine) aperture from Session class
-        self.session.draw_stimulus() 
+        """ Draws stimuli """
+        # if self.phase == 0:
+        #     self.session.cross_fix.draw()
+        # elif self.phase == 1:
+        #     self.session.draw_stimulus()
+
+        self.session.draw_stimulus()
         # self.session.mask_stim.draw()
         
         
