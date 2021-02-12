@@ -37,8 +37,8 @@ class AttSizeStim():
                  session,
                  n_sections=1,
                  ecc_min=0,
-                 ecc_max=2,
-                 n_rings=50,
+                 ecc_max=10,
+                 n_rings=30,
                  row_spacing_factor=0.8,
                  opacity=0.1,
                  draw_ring=False,
@@ -74,11 +74,11 @@ class AttSizeStim():
                 ring_condition = np.floor(n_sections * ring_nr / total_rings)
                 for pa in np.linspace(0, 2 * np.pi, cpr, endpoint=False):
                     x, y = tools.coordinatetools.pol2cart(pa, ecc, units=None)
-                    element_array_np.append([self.session.pixels_per_degree * x,
-                                             self.session.pixels_per_degree * y,
+                    element_array_np.append([x,
+                                             y,
                                              ecc,
                                              pa,
-                                             self.session.pixels_per_degree * s,
+                                             s,
                                              1, 1, 1, 0.2, ring_nr, ring_condition])
             ring_nr += 1
 
@@ -121,7 +121,7 @@ class AttSizeStim():
 
         if self.draw_ring:
             self.ring = visual.Circle(self.session.win,
-                                      radius=ring_eccs[-1] * self.session.pixels_per_degree,
+                                      radius=ring_eccs[-1],
                                       lineColor=[-1, -1, -1],
                                       edges=256,
                                       opacity=0.1)

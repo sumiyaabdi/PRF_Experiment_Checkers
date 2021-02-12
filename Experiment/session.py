@@ -41,7 +41,6 @@ class PRFSession(Session):
 
         self.default_balance = self.settings['attn stim']['default_balance']
         self.color_range = self.settings['attn stim']['color_range']
-        self.pixels_per_degree = 8
         self.fix_color_default = self.settings['fixation stim']['default_color']
         self.fix_range = self.settings['fixation stim']['color_range']
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])

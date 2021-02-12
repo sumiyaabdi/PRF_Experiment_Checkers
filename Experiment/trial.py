@@ -64,9 +64,8 @@ class PRFTrial(Trial):
          if events:
              if 'q' in [ev[0] for ev in events]:  # specific key in settings?
 
-                 np.save(opj(self.session.output_dir, self.session.output_str+'_simple_response_data.npy'), {'Expected number of responses':len(self.session.dot_switch_color_times),
-                                                                                      'Total subject responses':self.session.total_responses,
-                                                                                      'Correct responses (within 0.8s of dot color change)':self.session.correct_responses})
+                 np.save(opj(self.session.output_dir, self.session.output_str+'_simple_response_data.npy'),
+                         {'Total subject responses': self.session.total_responses})
                  
                  if self.session.settings['PRF stimulus settings']['Screenshot']==True:
                      self.session.win.saveMovieFrames(opj(self.session.screen_dir, self.session.output_str+'_Screenshot.png'))
