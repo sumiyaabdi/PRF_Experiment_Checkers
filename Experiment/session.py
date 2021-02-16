@@ -39,15 +39,15 @@ class PRFSession(Session):
         
         super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
 
-        self.default_balance = self.settings['attn stim']['default_balance']
         self.color_range = self.settings['attn stim']['color_range']
-        self.fix_color_default = self.settings['fixation stim']['default_color']
         self.fix_range = self.settings['fixation stim']['color_range']
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
                         * len(np.where(self.bar_orientations != -1)[0]) \
                         + self.settings['PRF stimulus settings']['Blanks length'] \
                         * len(np.where(self.bar_orientations == -1)[0])
+        self.stim_per_trial = self.settings['attn stim']['stim_per_trial']
+        self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
 
         # set size of display
@@ -116,32 +116,28 @@ class PRFSession(Session):
                                    n_rings=self.settings['attn stim']['number of rings'],
                                    row_spacing_factor=self.settings['attn stim']['row spacing factor'],
                                    opacity=self.settings['attn stim']['opacity'])
-        print(f'COLOR_ORDERS: {self.largeAF.color_orders}')
-
 
         self.smallAF = FixationStim(self)
         self.cross_fix = cross_fixation(self.win, 0.2, (-1, -1, -1), opacity=0.5)
 
+        # create fixation lines
+        self.line1 = visual.Line(win=self.win,
+                                 units="pix",
+                                 lineColor=self.settings['fixation stim']['line_color'],
+                                 lineWidth=self.settings['fixation stim']['line_width'],
+                                 contrast=self.settings['fixation stim']['contrast'],
+                                 start=[-self.screen[0] / 2, self.screen[1] / 2],
+                                 end=[self.screen[0] / 2, -self.screen[1] / 2]
+                                 )
 
-    #         #as current basic task, generate fixation circles of different colors, with black border
-#
-#         fixation_radius_pixels=tools.monitorunittools.deg2pix(self.settings['PRF stimulus settings']['Size fixation dot in degrees'], self.monitor)/2
-#
-# #        self.fixation_circle = visual.Circle(self.win,
-# #            radius=fixation_radius_pixels,
-# #            units='pix', lineColor='black')
-#
-#
-#         #two colors of the fixation circle for the task
-#         self.fixation_disk_0 = visual.Circle(self.win,
-#             units='pix', radius=fixation_radius_pixels,
-#             fillColor=[1,-1,-1], lineColor=[1,-1,-1])
-#
-#         self.fixation_disk_1 = visual.Circle(self.win,
-#             units='pix', radius=fixation_radius_pixels,
-#             fillColor=[-1,1,-1], lineColor=[-1,1,-1])
-
-
+        self.line2 = visual.Line(win=self.win,
+                                 units="pix",
+                                 lineColor=self.settings['fixation stim']['line_color'],
+                                 lineWidth=self.settings['fixation stim']['line_width'],
+                                 contrast=self.settings['fixation stim']['contrast'],
+                                 start=[-self.screen[0] / 2, -self.screen[1] / 2],
+                                 end=[self.screen[0] / 2, self.screen[1] / 2]
+                                 )
 
 
     def create_trials(self):
@@ -151,8 +147,6 @@ class PRFSession(Session):
 
         self.correct_responses = 0
         self.total_responses = 0
-
-        self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps']*len(np.where(self.bar_orientations != -1)[0]) + self.settings['PRF stimulus settings']['Blanks length']*len(np.where(self.bar_orientations == -1)[0])
 
         print("Expected number of TRs: %d"%self.n_trials)
 
@@ -177,29 +171,36 @@ class PRFSession(Session):
         self.bar_direction_at_TR = np.round(np.random.rand(self.n_trials))
 
 
-
         ### attn trial details ###
-        signal = self.n_trials / 3
+        signal = self.n_stim / self.settings['attn stim']['signal']
 
         # create list of color balances for large AF trials
-        self.color_balances = np.r_[np.ones(int(signal / 2)) * self.default_balance + self.color_range,
-                                    np.ones(int(signal / 2)) * self.default_balance - self.color_range,
-                                    np.ones(int(self.n_trials - signal)) * self.default_balance]
+        self.color_balances = np.ones(self.n_stim - int(signal)) * np.median(self.color_range)
 
-        while len(self.color_balances) != self.n_trials:
-            self.color_balances = np.append(self.color_balances, self.default_balance)
+        for i in range(len(self.color_range)):
+            self.color_balances = np.append(self.color_balances,
+                                            (np.ones(int(signal/len(self.color_range)))*self.color_range[i]))
+
+        while len(self.color_balances) != self.n_stim:
+            self.color_balances = np.append(self.color_balances, np.median(self.color_range))
 
         np.random.shuffle(self.color_balances)
 
-        # create list of fixation colors for each trial in small AF task
-        self.fix_colors = np.r_[np.ones(int(self.n_trials - signal)) * self.fix_color_default,
-                                np.ones(int(signal / 2)) * self.fix_range,
-                                np.ones(int(signal / 2)) * -1 * self.fix_range]
+        print(f'self.n_stim: {self.n_stim}')
+        print(f'LEN COLOR BALANCES: {len(self.color_balances)}')
 
-        while len(self.fix_colors) != self.n_trials:
-            self.fix_colors = np.append(self.fix_colors, self.fix_color_default)
+        # create list of fixation colors for each trial in small AF task
+        self.fix_colors = np.ones(self.n_stim - int(signal)) * np.median(self.fix_range)
+
+        for i in range(len(self.color_range)):
+            self.fix_colors = np.append(self.fix_colors,
+                                        (np.ones(int(signal / len(self.fix_range))) * self.fix_range[i]))
+
+        while len(self.fix_colors) != self.n_stim:
+            self.fix_colors = np.append(self.fix_colors, np.median(self.fix_range))
 
         np.random.shuffle(self.fix_colors)
+        # print(f'FIX COLORS: {self.fix_colors}')
 
         # trial list
         for i in range(self.n_trials):
@@ -208,9 +209,7 @@ class PRFSession(Session):
 
                                         bar_orientation=self.bar_orientation_at_TR[i],
                                         bar_position_in_ori=self.bar_pos_in_ori[i],
-                                        bar_direction=self.bar_direction_at_TR[i],
-                                        color_balance=self.color_balances[i]
-                                        # ,tracker=self.tracker
+                                        bar_direction=self.bar_direction_at_TR[i]
                                         ))
 
         # times for dot color change. continue the task into the topup
@@ -219,16 +218,7 @@ class PRFSession(Session):
         if self.settings['mri']['topup_scan'] == True:
             self.total_time += self.topup_scan_duration
 
-        # #DOT COLOR CHANGE TIMES
-        # self.dot_switch_color_times = np.arange(3,self.total_time,3.5)
-        # self.dot_switch_color_times += (2*np.random.rand(len(self.dot_switch_color_times))-1)
-        #
-        #
-        # #needed to keep track of which dot to print
-        # self.current_dot_time=0
-        # self.next_dot_time=1
-
-    def draw_stimulus(self):
+    def draw_prf_stimulus(self):
         #this timing is only used for the motion of checkerboards inside the bar. it does not have any effect on the actual bar motion
         present_time = self.clock.getTime()
         
@@ -242,8 +232,14 @@ class PRFSession(Session):
                                orientation=self.current_trial.bar_orientation,
                                bar_direction=self.current_trial.bar_direction)
 
-        self.largeAF.draw(self.current_trial.color_balance, self.current_trial.trial_nr)
-        self.smallAF.draw(self.fix_colors[self.current_trial.trial_nr],
+    def draw_attn_stimulus(self, phase):
+        self.stim_nr = self.current_trial.trial_nr * self.stim_per_trial + phase -1
+        # print(f'trial: {self.current_trial.trial_nr}')
+        # print(f'self.stim_per_trial: {self.stim_per_trial}')
+        print(f'STIM NR: {self.stim_nr}')
+        # print(f'phase: {phase}')
+        self.largeAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
+        self.smallAF.draw(self.fix_colors[self.stim_nr],
                           radius=self.settings['fixation stim'].get('radius'))
   
 

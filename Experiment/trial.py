@@ -7,7 +7,8 @@ Created on Mon Feb 25 14:06:36 2019
 """
 
 from exptools2.core.trial import Trial
-from psychopy import event
+import psychtoolbox as ptb
+from psychopy import event, sound
 import numpy as np
 import os
 
@@ -18,46 +19,105 @@ opj = os.path.join
 class PRFTrial(Trial):
 
     def __init__(self, session, trial_nr, bar_orientation, bar_position_in_ori,
-                 bar_direction, color_balance, phase_durations=(0.3,0.4), *args, **kwargs):
-
-        super().__init__(session, trial_nr,
-            phase_durations, verbose=False,
-            *args,
-            **kwargs)
+                 bar_direction, *args, **kwargs):
 
         #trial number and bar parameters   
         self.bar_orientation = bar_orientation
         self.bar_position_in_ori = bar_position_in_ori
         self.bar_direction = bar_direction
-        self.color_balance = color_balance
+        self.session = session
 
         #here we decide how to go from each trial (bar position) to the next.    
         if self.session.settings['PRF stimulus settings']['Scanner sync']==True:
             #dummy value: if scanning or simulating a scanner, everything is synced to the output 't' of the scanner
-            self.phase_durations = [100]
+            self.phase_durations = [100]*self.session.stim_per_trial
         else:
             #if not synced to a real or simulated scanner, take the bar pass step as length
-            self.phase_durations = [self.session.settings['PRF stimulus settings']['Bar step length']]
-            
+            self.phase_durations = [self.session.settings['PRF stimulus settings']['Bar step length']\
+                                   /(self.session.stim_per_trial*2)]*(self.session.stim_per_trial*2)
+
+        super().__init__(session, trial_nr, self.phase_durations,
+                         verbose=False, *args, **kwargs)
+
         #add topup time to last trial
         if self.session.settings['mri']['topup_scan']==True:
             if self.trial_nr == self.session.n_trials-1:
                 self.phase_durations=[self.session.topup_scan_duration]
 
+        self.stim_nr = self.trial_nr * self.session.stim_per_trial + self.phase - 1
+
+        # # create sound
+        # sound_cue = sound.Sound('A', 0.1,)
+        # now = ptb.GetSecs()
+        # play_times = self.session.settings['sound']['play_times']
+        # sound_cue.play(when=now in play_times)
+
+
     
     def draw(self, *args, **kwargs):
         # draw bar stimulus and circular (raised cosine) aperture from Session class
         """ Draws stimuli """
-        # if self.phase == 0:
-        #     self.session.cross_fix.draw()
-        # elif self.phase == 1:
-        #     self.session.draw_stimulus()
+        self.session.draw_prf_stimulus()
+        self.session.mask_stim.draw()
 
-        self.session.draw_stimulus()
-        # self.session.mask_stim.draw()
+        # # uncomment below to draw diagonal fixation lines
+        # self.session.line1.draw()
+        # self.session.line2.draw()
+
+        if self.phase % 2 == 0:
+            self.session.cross_fix.draw()
+
+        elif self.phase % 2 == 1:
+            self.session.draw_attn_stimulus(phase=int((self.phase-1)/2))
         
-        
-        
+    def log_phase_info(self, phase=None):
+        """ Method passed to win.callonFlip, such that the
+        onsets get logged *exactly* on the screen flip.
+        Phase can be passed as an argument to log the onsets
+        of phases that finish before a window flip (e.g.,
+        phases with duration = 0, and are skipped on some
+        trials).
+        """
+        onset = self.session.clock.getTime()
+
+        if phase is None:
+            phase = self.phase
+
+        if phase == 0:
+            self.start_trial = onset
+
+            if self.verbose:
+                print(f'Starting trial {self.trial_nr}')
+
+        msg = f"\tPhase {phase} start: {onset:.5f}"
+
+        if self.verbose:
+            print(msg)
+
+        if self.eyetracker_on:  # send msg to eyetracker
+            msg = f'start_type-stim_trial-{self.trial_nr}_phase-{phase}'
+            self.session.tracker.sendMessage(msg)
+            # Should be log more to the eyetracker? Like 'parameters'?
+
+        # add to global log
+        idx = self.session.global_log.shape[0]
+        self.session.global_log.loc[idx, 'onset'] = onset
+        self.session.global_log.loc[idx, 'trial_nr'] = self.trial_nr
+        self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[self.stim_nr]
+        self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[self.stim_nr]
+        self.session.global_log.loc[idx, 'event_type'] = self.phase_names[phase]
+        self.session.global_log.loc[idx, 'phase'] = phase
+        self.session.global_log.loc[idx, 'nr_frames'] = self.session.nr_frames
+
+        for param, val in self.parameters.items():  # add parameters to log
+            self.session.global_log.loc[idx, param] = val
+
+        # add to trial_log
+        # idx = self.trial_log.shape[0]
+        # self.trial_log.loc[idx, 'onset'][self.phase].append(onset)
+
+        self.session.nr_frames = 0
+
     def get_events(self):
          """ Logs responses/triggers """
          events = event.getKeys(timeStamped=self.session.clock)
@@ -88,24 +148,15 @@ class PRFTrial(Trial):
                      event_type = 'response'
                      self.session.total_responses += 1
                      
-                     # #tracking percentage of correct responses per session
-                     # if self.session.current_dot_time==0:
-                     #     if t>self.session.dot_switch_color_times[0] and t<self.session.dot_switch_color_times[0] + 0.8:
-                     #         self.session.correct_responses += 1
-                     # else:
-                     #     if t>self.session.dot_switch_color_times[self.session.current_dot_time] and t<self.session.dot_switch_color_times[self.session.current_dot_time] + 0.8:
-                     #         self.session.correct_responses += 1
-                     #
-                     #     elif t>self.session.dot_switch_color_times[self.session.next_dot_time] and t<self.session.dot_switch_color_times[self.session.next_dot_time] + 0.8:
-                     #         self.session.correct_responses += 1
 
- 
                  idx = self.session.global_log.shape[0]
                  self.session.global_log.loc[idx, 'trial_nr'] = self.trial_nr
                  self.session.global_log.loc[idx, 'onset'] = t
                  self.session.global_log.loc[idx, 'event_type'] = event_type
                  self.session.global_log.loc[idx, 'phase'] = self.phase
                  self.session.global_log.loc[idx, 'response'] = key
+                 self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[self.session.stim_nr]
+                 self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[self.session.stim_nr]
  
                  for param, val in self.parameters.items():
                      self.session.global_log.loc[idx, param] = val

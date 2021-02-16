@@ -35,12 +35,12 @@ class AttSizeStim():
     """
     def __init__(self,
                  session,
-                 n_sections=1,
-                 ecc_min=0,
-                 ecc_max=10,
-                 n_rings=30,
-                 row_spacing_factor=0.8,
-                 opacity=0.1,
+                 n_sections,
+                 ecc_min,
+                 ecc_max,
+                 n_rings,
+                 row_spacing_factor,
+                 opacity,
                  draw_ring=False,
                  **kwargs):
 
@@ -97,7 +97,7 @@ class AttSizeStim():
         n_elements =  sum(self.element_array_np[:, -1] == 0)
 
         self.color_orders = []
-        for i in range(session.n_trials):
+        for i in range(session.n_stim):
             i = np.arange(n_elements)
             np.random.shuffle(i)
             self.color_orders.append(i)
@@ -105,14 +105,13 @@ class AttSizeStim():
         self.color_orders = np.array(self.color_orders)
 
 
-    def draw(self, color_balance, trial_nr):
+    def draw(self, color_balance, stim_nr):
         this_ring_bool = self.element_array_np[:, -1] == 0
         nr_elements_in_condition = this_ring_bool.sum()
-
         nr_signal_elements = int(nr_elements_in_condition * color_balance)
         ordered_signals = np.r_[np.ones((nr_signal_elements, 3)) * self.color1,
                                 np.ones((nr_elements_in_condition - nr_signal_elements, 3)) * self.color2]
-        ordered_signals = ordered_signals[self.color_orders][trial_nr, :]
+        ordered_signals = ordered_signals[self.color_orders][stim_nr, :]
 
         self.element_array_np[this_ring_bool, 5:8] = ordered_signals
         self.element_array_stim.setColors(ordered_signals, log=False)
