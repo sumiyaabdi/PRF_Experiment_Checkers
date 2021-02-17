@@ -40,7 +40,8 @@ class PRFSession(Session):
         super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
 
         self.color_range = self.settings['attn stim']['color_range']
-        self.fix_range = self.settings['fixation stim']['color_range']
+        self.fix_range = self.settings['fixation stim']['gray_range']
+        print(f'self.fix_range: {self.fix_range}')
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
                         * len(np.where(self.bar_orientations != -1)[0]) \
@@ -186,13 +187,11 @@ class PRFSession(Session):
 
         np.random.shuffle(self.color_balances)
 
-        print(f'self.n_stim: {self.n_stim}')
-        print(f'LEN COLOR BALANCES: {len(self.color_balances)}')
 
         # create list of fixation colors for each trial in small AF task
         self.fix_colors = np.ones(self.n_stim - int(signal)) * np.median(self.fix_range)
 
-        for i in range(len(self.color_range)):
+        for i in range(len(self.fix_range)):
             self.fix_colors = np.append(self.fix_colors,
                                         (np.ones(int(signal / len(self.fix_range))) * self.fix_range[i]))
 
@@ -233,11 +232,7 @@ class PRFSession(Session):
                                bar_direction=self.current_trial.bar_direction)
 
     def draw_attn_stimulus(self, phase):
-        self.stim_nr = self.current_trial.trial_nr * self.stim_per_trial + phase -1
-        # print(f'trial: {self.current_trial.trial_nr}')
-        # print(f'self.stim_per_trial: {self.stim_per_trial}')
-        print(f'STIM NR: {self.stim_nr}')
-        # print(f'phase: {phase}')
+        self.stim_nr = self.current_trial.trial_nr * self.stim_per_trial + int((phase-1)/2)
         self.largeAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
         self.smallAF.draw(self.fix_colors[self.stim_nr],
                           radius=self.settings['fixation stim'].get('radius'))

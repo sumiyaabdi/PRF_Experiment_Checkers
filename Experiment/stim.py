@@ -22,7 +22,7 @@ class FixationStim():
         self.session = session
 
     def draw(self, color=0, radius=0.1):
-        self.color = [color]*3 # turns into RGN array
+        self.color = [color]*3 # turns into RGB array
         self.radius = radius
         self.stim = visual.Circle(self.session.win, lineColor='black', radius=radius,
                              fillColor=self.color, edges=100)
@@ -48,8 +48,8 @@ class AttSizeStim():
         self.n_sections = n_sections
         self.opacity = opacity
         self.draw_ring = draw_ring
-        self.color1 = [-0.8, 0.18, 1] # (x+1)/2 : 0.1,0.59,1
-        self.color2 = [1, -1, 0.4] # 1,0,1
+        self.color1 = self.session.settings['attn stim']['color1']
+        self.color2 = self.session.settings['attn stim']['color2']
 
         total_rings = self.n_sections * (n_rings + 1) + 1
 

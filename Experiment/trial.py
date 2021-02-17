@@ -68,7 +68,7 @@ class PRFTrial(Trial):
             self.session.cross_fix.draw()
 
         elif self.phase % 2 == 1:
-            self.session.draw_attn_stimulus(phase=int((self.phase-1)/2))
+            self.session.draw_attn_stimulus(phase=self.phase)
         
     def log_phase_info(self, phase=None):
         """ Method passed to win.callonFlip, such that the
