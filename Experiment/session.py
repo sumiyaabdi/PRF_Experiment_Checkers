@@ -235,7 +235,6 @@ class PRFSession(Session):
             self.current_trial = self.trials[trial_idx]
             self.current_trial_start_time = self.clock.getTime()
             self.current_trial.run()
-            print(f'CURRENT TRIAL: {self.current_trial.trial_nr}')
         
         print('Total subject responses: %d'%self.total_responses)
         np.save(opj(self.output_dir, self.output_str+'_simple_response_data.npy'), {'Total subject responses':self.total_responses})
