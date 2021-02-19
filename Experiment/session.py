@@ -18,6 +18,7 @@ from psychopy.visual import filters
 from exptools2.core.session import Session
 from trial import PRFTrial
 from stim import PRFStim, AttSizeStim, FixationStim, cross_fixation
+from utils import create_stim_list
 
 
 opj = os.path.join
@@ -175,31 +176,9 @@ class PRFSession(Session):
         ### attn trial details ###
         signal = self.n_stim / self.settings['attn stim']['signal']
 
-        # create list of color balances for large AF trials
-        self.color_balances = np.ones(self.n_stim - int(signal)) * np.median(self.color_range)
+        self.color_balances = create_stim_list(self.n_stim, signal, self.color_range)
+        self.fix_colors = create_stim_list(self.n_stim, signal, self.fix_range)
 
-        for i in range(len(self.color_range)):
-            self.color_balances = np.append(self.color_balances,
-                                            (np.ones(int(signal/len(self.color_range)))*self.color_range[i]))
-
-        while len(self.color_balances) != self.n_stim:
-            self.color_balances = np.append(self.color_balances, np.median(self.color_range))
-
-        np.random.shuffle(self.color_balances)
-
-
-        # create list of fixation colors for each trial in small AF task
-        self.fix_colors = np.ones(self.n_stim - int(signal)) * np.median(self.fix_range)
-
-        for i in range(len(self.fix_range)):
-            self.fix_colors = np.append(self.fix_colors,
-                                        (np.ones(int(signal / len(self.fix_range))) * self.fix_range[i]))
-
-        while len(self.fix_colors) != self.n_stim:
-            self.fix_colors = np.append(self.fix_colors, np.median(self.fix_range))
-
-        np.random.shuffle(self.fix_colors)
-        # print(f'FIX COLORS: {self.fix_colors}')
 
         # trial list
         for i in range(self.n_trials):
