@@ -4,20 +4,19 @@ preferences:
         units: deg
 
 window:
-    size: [1440, 900] # [1920, 1080]
+    size: [1920, 1080] # [1440, 900] 
     pos: [0, 0]
     color: [0, 0, 0]
-    fullscr: False
+    fullscr: True
     winType: pyglet
     waitBlanking: True
-    display: rectangle
 
-operating system: mac
+operating system: linux
 
 monitor:
     name: default
-    width: 28.65 # 69.8 # in cm
-    distance: 53.854 # 210  # in cm
+    width: 69.8 # in cm, mac: 28.65 
+    distance:  210  # in cm, mac: 53.854 
     gamma: 1
 
 mouse:
@@ -41,15 +40,13 @@ mri:
 
 attn stim:
     number of sections: 1
-    min eccentricity: 0.3
-    max eccentricity: 10
-    number of rings: 20
-    row spacing factor: 0.8
+    number of rings: 15
+    row spacing factor: 1
     opacity: 0.15
-    color1: [-0.8, 0.18, 1]
-    color2: [1, -1, 0.4]
+    color1: [0.5, 0.5, 0.5] # [-0.8, 0.18, 1]
+    color2: [-0.5, -0.5, -0.5] # [1, -0.3, 0.7]
     default_balance: 0.5
-    color_range: [0.2, 0.3,0.7, 0.8]
+    color_range: [0.3, 0.4,0.6, 0.7]
     stim_per_trial: 2
     signal: 5
 
@@ -60,7 +57,7 @@ fixation stim:
   contrast: 0.15
   radius: 0.1
   default_color: 0
-  gray_range: [-0.2, -0.1, 0.1, 0.2]
+  gray_range: [-0.1, -0.05, 0.05, 0.1]
 
 sound:
     play_times: [3, 20, 45, 72, 108, 129]

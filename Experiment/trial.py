@@ -7,7 +7,7 @@ Created on Mon Feb 25 14:06:36 2019
 """
 
 from exptools2.core.trial import Trial
-import psychtoolbox as ptb
+# import psychtoolbox as ptb
 from psychopy import event, sound
 import numpy as np
 import os
@@ -60,14 +60,14 @@ class PRFTrial(Trial):
         self.session.draw_prf_stimulus()
         self.session.mask_stim.draw()
 
-        # # uncomment below to draw diagonal fixation lines
-        # self.session.line1.draw()
-        # self.session.line2.draw()
+        # uncomment below to draw diagonal fixation lines
+        self.session.line1.draw()
+        self.session.line2.draw()
 
-        if self.phase % 2 == 0:
-            self.session.cross_fix.draw()
+        # if self.phase % 2 == 0:
+            # self.session.cross_fix.draw()
 
-        elif self.phase % 2 == 1:
+        if self.phase % 2 == 1:
             self.session.draw_attn_stimulus(phase=self.phase)
         
     def log_phase_info(self, phase=None):

@@ -21,12 +21,13 @@ class FixationStim():
     def __init__(self, session):
         self.session = session
 
-    def draw(self, color=0, radius=0.1):
+    def draw(self, color=0, radius=0.1, outline=True):
         self.color = [color]*3 # turns into RGB array
         self.radius = radius
-        self.stim = visual.Circle(self.session.win, lineColor='black', radius=radius,
-                             fillColor=self.color, edges=100)
-        self.stim.draw()
+        if outline:
+            self.stim = visual.Circle(self.session.win, lineColor='black', lineWidth=0.5, 
+                             radius=radius, fillColor=self.color, edges=100)
+            self.stim.draw()
 
 class AttSizeStim():
     """

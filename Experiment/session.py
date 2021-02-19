@@ -27,7 +27,7 @@ opj = os.path.join
 
 class PRFSession(Session):
 
-    def __init__(self, output_str, output_dir, settings_file, macbook_bool=True):
+    def __init__(self, output_str, output_dir, settings_file):
 
         """
 
@@ -52,15 +52,19 @@ class PRFSession(Session):
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
 
-        # set size of display
-        if self.settings['window']['display'] == 'square':
-            self.screen = np.array([self.win.size[1], self.win.size[1]])
+        print(f'Monitor size (deg): {tools.monitorunittools.pix2deg(self.win.size[1],self.monitor)}')
 
-        elif self.settings['window']['display'] == 'rectangle':
+        # # set size of display
+        # if self.settings['window']['display'] == 'square':
+        #     self.screen = np.array([self.win.size[1], self.win.size[1]])
+
+        # elif self.settings['window']['display'] == 'rectangle':
+        #     self.screen = np.array([self.win.size[0], self.win.size[1]])
+
+        if self.settings['operating system'] == 'mac':  # to compensate for macbook retina display
+            self.screen = np.array([self.win.size[0], self.win.size[1]]) / 2
+        else:
             self.screen = np.array([self.win.size[0], self.win.size[1]])
-
-        if macbook_bool:  # to compensate for macbook retina display
-            self.screen = self.screen / 2
 
 
         #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
@@ -111,10 +115,12 @@ class PRFSession(Session):
                                         pos = np.array((0.0,0.0)), 
                                         color = [0,0,0])
 
+        
+
         self.largeAF = AttSizeStim(self,
                                    n_sections=self.settings['attn stim']['number of sections'],
-                                   ecc_min=self.settings['attn stim']['min eccentricity'],
-                                   ecc_max=self.settings['attn stim']['max eccentricity'],
+                                   ecc_min=self.settings['fixation stim']['radius'] + 0.2,
+                                   ecc_max= tools.monitorunittools.pix2deg(self.win.size[1],self.monitor)/2 + 0.5, # radius
                                    n_rings=self.settings['attn stim']['number of rings'],
                                    row_spacing_factor=self.settings['attn stim']['row spacing factor'],
                                    opacity=self.settings['attn stim']['opacity'])
@@ -128,8 +134,8 @@ class PRFSession(Session):
                                  lineColor=self.settings['fixation stim']['line_color'],
                                  lineWidth=self.settings['fixation stim']['line_width'],
                                  contrast=self.settings['fixation stim']['contrast'],
-                                 start=[-self.screen[0] / 2, self.screen[1] / 2],
-                                 end=[self.screen[0] / 2, -self.screen[1] / 2]
+                                 start=[-self.screen[1], self.screen[1]],
+                                 end=[self.screen[1], -self.screen[1]]
                                  )
 
         self.line2 = visual.Line(win=self.win,
@@ -137,8 +143,8 @@ class PRFSession(Session):
                                  lineColor=self.settings['fixation stim']['line_color'],
                                  lineWidth=self.settings['fixation stim']['line_width'],
                                  contrast=self.settings['fixation stim']['contrast'],
-                                 start=[-self.screen[0] / 2, -self.screen[1] / 2],
-                                 end=[self.screen[0] / 2, self.screen[1] / 2]
+                                 start=[-self.screen[1], -self.screen[1]],
+                                 end=[self.screen[1], self.screen[1]]
                                  )
 
 
@@ -231,14 +237,8 @@ class PRFSession(Session):
             self.current_trial.run()
             print(f'CURRENT TRIAL: {self.current_trial.trial_nr}')
         
-        print('Expected number of responses: %d'%len(self.dot_switch_color_times))
         print('Total subject responses: %d'%self.total_responses)
-        print('Correct responses (within 0.8s of dot color change): %d'%self.correct_responses)
-        np.save(opj(self.output_dir, self.output_str+'_simple_response_data.npy'), {'Expected number of responses':len(self.dot_switch_color_times),
-        														                      'Total subject responses':self.total_responses,
-        														                      'Correct responses (within 0.8s of dot color change)':self.correct_responses})
-        
-        #print('Percentage of correctly answered trials: %.2f%%'%(100*self.correct_responses/len(self.dot_switch_color_times)))
+        np.save(opj(self.output_dir, self.output_str+'_simple_response_data.npy'), {'Total subject responses':self.total_responses})
         
         
         if self.settings['PRF stimulus settings']['Screenshot']==True:
