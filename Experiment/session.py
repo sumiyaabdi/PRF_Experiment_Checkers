@@ -185,6 +185,9 @@ class PRFSession(Session):
         self.color_balances = create_stim_list(self.n_stim, signal, self.color_range)
         self.fix_colors = create_stim_list(self.n_stim, signal, self.fix_range)
 
+        print(f'color_balances: {self.color_balances} \nLEN color balances:{len(self.color_balances)}')
+        print(f'n.stim: {self.n_stim}')
+
 
         # trial list
         for i in range(self.n_trials):
