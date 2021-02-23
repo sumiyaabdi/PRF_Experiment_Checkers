@@ -7,7 +7,7 @@ Created on Mon Feb 25 14:06:36 2019
 """
 
 from exptools2.core.trial import Trial
-import psychtoolbox as ptb
+# import psychtoolbox as ptb
 from psychopy import event, sound
 import numpy as np
 import os
@@ -44,7 +44,7 @@ class PRFTrial(Trial):
             if self.trial_nr == self.session.n_trials-1:
                 self.phase_durations=[self.session.topup_scan_duration]
 
-        self.stim_nr = self.trial_nr * self.session.stim_per_trial + self.phase - 1
+        self.stim_nr = int(self.trial_nr * self.session.stim_per_trial + int((self.phase-1)/2))
 
         # # create sound
         # sound_cue = sound.Sound('A', 0.1,)
@@ -60,14 +60,14 @@ class PRFTrial(Trial):
         self.session.draw_prf_stimulus()
         self.session.mask_stim.draw()
 
-        # # uncomment below to draw diagonal fixation lines
-        # self.session.line1.draw()
-        # self.session.line2.draw()
+        # uncomment below to draw diagonal fixation lines
+        self.session.line1.draw()
+        self.session.line2.draw()
 
         if self.phase % 2 == 0:
-            self.session.cross_fix.draw()
-
-        elif self.phase % 2 == 1:
+            self.session.smallAF.draw(0,radius=self.session.settings['fixation stim'].get('radius'))
+  
+        if self.phase % 2 == 1:
             self.session.draw_attn_stimulus(phase=self.phase)
         
     def log_phase_info(self, phase=None):
@@ -103,8 +103,8 @@ class PRFTrial(Trial):
         idx = self.session.global_log.shape[0]
         self.session.global_log.loc[idx, 'onset'] = onset
         self.session.global_log.loc[idx, 'trial_nr'] = self.trial_nr
-        self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[self.stim_nr]
-        self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[self.stim_nr]
+        self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[int(self.trial_nr * self.session.stim_per_trial + (self.phase-1)/2)]
+        self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[int(self.trial_nr * self.session.stim_per_trial + (self.phase-1)/2)]
         self.session.global_log.loc[idx, 'event_type'] = self.phase_names[phase]
         self.session.global_log.loc[idx, 'phase'] = phase
         self.session.global_log.loc[idx, 'nr_frames'] = self.session.nr_frames
