@@ -231,16 +231,6 @@ class PRFSession(Session):
             self.current_trial.run()
             print(f'CURRENT TRIAL: {self.current_trial.trial_nr}')
         
-        print('Expected number of responses: %d'%len(self.dot_switch_color_times))
-        print('Total subject responses: %d'%self.total_responses)
-        print('Correct responses (within 0.8s of dot color change): %d'%self.correct_responses)
-        np.save(opj(self.output_dir, self.output_str+'_simple_response_data.npy'), {'Expected number of responses':len(self.dot_switch_color_times),
-        														                      'Total subject responses':self.total_responses,
-        														                      'Correct responses (within 0.8s of dot color change)':self.correct_responses})
-        
-        #print('Percentage of correctly answered trials: %.2f%%'%(100*self.correct_responses/len(self.dot_switch_color_times)))
-        
-        
         if self.settings['PRF stimulus settings']['Screenshot']==True:
             self.win.saveMovieFrames(opj(self.screen_dir, self.output_str+'_Screenshot.png'))
             
