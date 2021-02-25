@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def create_stim_list(n, signal, values):
+def create_stim_list(n, signal, values,midpoint):
     """
 
     Parameters
@@ -17,7 +17,7 @@ def create_stim_list(n, signal, values):
     """
 
     targets = []
-    baseline = np.ones(int(n - signal)) * np.median(values)
+    baseline = np.ones(int(n - signal)) * midpoint
 
     for i in range(len(values)):
         targets = np.append(targets, (np.ones(int(signal / len(values))) * values[i]))
@@ -28,6 +28,6 @@ def create_stim_list(n, signal, values):
     stim_list = np.insert(baseline, locs, targets)
 
     while len(stim_list) != n:
-        stim_list = np.insert(stim_list, 0, np.median(values))
+        stim_list = np.insert(stim_list, 0, midpoint)
 
     return stim_list
