@@ -46,13 +46,6 @@ class PRFTrial(Trial):
 
         self.stim_nr = int(self.trial_nr * self.session.stim_per_trial + int((self.phase-1)/2))
 
-        # # create sound
-        # sound_cue = sound.Sound('A', 0.1,)
-        # now = ptb.GetSecs()
-        # play_times = self.session.settings['sound']['play_times']
-        # sound_cue.play(when=now in play_times)
-
-
     
     def draw(self, *args, **kwargs):
         # draw bar stimulus and circular (raised cosine) aperture from Session class

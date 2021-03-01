@@ -74,8 +74,6 @@ class PRFSession(Session):
         if self.settings['PRF stimulus settings']['Scanner sync']==True:
             self.bar_step_length = self.settings['mri']['TR']
             self.mri_trigger='t'
-
-                     
         else:
             self.bar_step_length = self.settings['PRF stimulus settings']['Bar step length']
             
@@ -120,7 +118,7 @@ class PRFSession(Session):
         self.largeAF = AttSizeStim(self,
                                    n_sections=self.settings['attn stim']['number of sections'],
                                    ecc_min=self.settings['fixation stim']['radius'] + 0.2,
-                                   ecc_max= tools.monitorunittools.pix2deg(self.win.size[1],self.monitor)/2 + 0.5, # radius
+                                   ecc_max= tools.monitorunittools.pix2deg(self.screen[1],self.monitor)/2 + 0.5, # radius
                                    n_rings=self.settings['attn stim']['number of rings'],
                                    row_spacing_factor=self.settings['attn stim']['row spacing factor'],
                                    opacity=self.settings['attn stim']['opacity'])
