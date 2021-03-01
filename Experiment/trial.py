@@ -155,8 +155,8 @@ class PRFTrial(Trial):
                  self.session.global_log.loc[idx, 'event_type'] = event_type
                  self.session.global_log.loc[idx, 'phase'] = self.phase
                  self.session.global_log.loc[idx, 'response'] = key
-                 self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[int(self.trial_nr * self.session.stim_per_trial + (self.phase-1)/2)]
-                 self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[int(self.trial_nr * self.session.stim_per_trial + (self.phase-1)/2)]
+                 self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[self.session.stim_nr]
+                 self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[self.session.stim_nr]
  
                  for param, val in self.parameters.items():
                      self.session.global_log.loc[idx, param] = val
