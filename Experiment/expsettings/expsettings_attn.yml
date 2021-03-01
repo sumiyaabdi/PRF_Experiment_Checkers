@@ -46,15 +46,12 @@ attn stim:
     color1: [0.5, 0.5, 0.5] # [1,-1,1] # [-0.8, 0.18, 1] # 
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] # 
     default_balance: 0.5
-<<<<<<< Updated upstream
     color_range: [0.35, 0.45,0.65, 0.8]
     stim_per_trial: 2
     signal: 6
-=======
     color_range: [0.25, 0.2, 0.1, 0.15]
     stim_per_trial: 2
     signal: 2
->>>>>>> Stashed changes
 
 fixation stim:
   line_color: black
