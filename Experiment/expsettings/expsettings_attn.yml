@@ -7,7 +7,7 @@ window:
     size: [1920, 1080] # [1440, 900]
     pos: [0, 0]
     color: [0, 0, 0]
-    fullscr: True
+    fullscr: False
     winType: pyglet
     waitBlanking: True
 
@@ -49,9 +49,6 @@ attn stim:
     color_range: [0.35, 0.45,0.65, 0.8]
     stim_per_trial: 2
     signal: 6
-    color_range: [0.25, 0.2, 0.1, 0.15]
-    stim_per_trial: 2
-    signal: 2
 
 fixation stim:
   line_color: black
@@ -66,7 +63,7 @@ sound:
     play_times: [3, 20, 45, 72, 108, 129]
 
 PRF stimulus settings:
-    Scanner sync: False                # set this to true to make bar move on input 't'
+    Scanner sync: True                # set this to true to make bar move on input 't'
     Screenshot: True
     Squares in bar: 2
     Bar pass steps: 20                # number of steps the bar takes to traverse the aperture
