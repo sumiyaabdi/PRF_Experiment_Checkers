@@ -42,7 +42,6 @@ class PRFSession(Session):
 
         self.color_range = self.settings['attn stim']['color_range']
         self.fix_range = self.settings['fixation stim']['gray_range']
-        print(f'self.fix_range: {self.fix_range}')
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
                         * len(np.where(self.bar_orientations != -1)[0]) \
@@ -51,15 +50,6 @@ class PRFSession(Session):
         self.stim_per_trial = self.settings['attn stim']['stim_per_trial']
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
-
-        print(f'Monitor size (deg): {tools.monitorunittools.pix2deg(self.win.size[1],self.monitor)}')
-
-        # # set size of display
-        # if self.settings['window']['display'] == 'square':
-        #     self.screen = np.array([self.win.size[1], self.win.size[1]])
-
-        # elif self.settings['window']['display'] == 'rectangle':
-        #     self.screen = np.array([self.win.size[0], self.win.size[1]])
 
         if self.settings['operating system'] == 'mac':  # to compensate for macbook retina display
             self.screen = np.array([self.win.size[0], self.win.size[1]]) / 2
@@ -183,8 +173,8 @@ class PRFSession(Session):
         self.color_balances = create_stim_list(self.n_stim, signal, self.color_range, self.settings['attn stim']['default_balance'])
         self.fix_colors = create_stim_list(self.n_stim, signal, self.fix_range, self.settings['fixation stim']['default_color'])
 
-        print(f'color_balances: {self.color_balances} \nLEN color balances:{len(self.color_balances)}')
-        print(f'n.stim: {self.n_stim}')
+        # print(f'color_balances: {self.color_balances} \nLEN color balances:{len(self.color_balances)}')
+        # print(f'n.stim: {self.n_stim}')
 
 
         # trial list
