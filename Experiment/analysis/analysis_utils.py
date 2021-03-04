@@ -86,9 +86,10 @@ def analyse_logs(all_logs, duration=1):
     """
 
     runs = sorted([int(i) for i in all_logs.run.unique()])
-    psychophysics = pd.DataFrame(columns=['run', 'task', 'hits', 'misses', 'fas', 'correjs', 'dprime', 'accuracy'])
-    small_AF_corr = []
+    psychophysics = pd.DataFrame(columns=['run', 'task', 'hits', 'misses', 'fas', 'correjs', 'dprime', 'criterion'])
+    d_per_diff = pd.DataFrame(columns=['run', 'task','difficulty','hit_rate','fa_rate','d_prime','criterion'])
     large_AF_corr = []
+    small_AF_corr = []
 
     for this_run in runs:
         this_run = str(this_run)
@@ -112,8 +113,8 @@ def analyse_logs(all_logs, duration=1):
         fp = len(responses) - tp  # false positives (responded with no switch)
         tn = len(stim_df) - len(switch_loc) - fn  # true negative
 
-        accuracy = (tp + tn) / (tp + fn + fp + tn)
-        d, _ = d_prime(tp, fn, fp, tn)
+        # accuracy = (tp + tn) / (tp + fn + fp + tn)
+        d, c = d_prime(tp, fn, fp, tn)
 
         difficulty = sorted(stim_df[task].unique())
 
@@ -138,7 +139,7 @@ def analyse_logs(all_logs, duration=1):
                 fas.append(idx)
                 stim_df.loc[response_ids[idx], 'correct'] = 0
 
-        [stim_df.loc[response_ids[i]] for i in fas]
+        # [stim_df.loc[response_ids[i]] for i in fas]
 
         # set remaining nans as correct rejections
         cor_rej = stim_df[stim_df.loc[:, 'correct'].isna()].index
@@ -151,18 +152,27 @@ def analyse_logs(all_logs, duration=1):
                                               'fas': fp,
                                               'correjs': tn,
                                               'dprime': d,
-                                              'accuracy': accuracy}, ignore_index=True)
+                                              'criterion': c, 
+                                              'difficulties': difficulty}, ignore_index=True)
 
         # get proportion correct
-        difficulty = sorted(stim_df[task].unique())
         for i in difficulty:
+            hit_rate = (sum(stim_df[stim_df[task] == i].correct) / len(stim_df[stim_df[task] == i]))
             if task == 'color_balance':
                 if i != 0.5:
-                    large_AF_corr.append(
-                        [i, sum(stim_df[stim_df[task] == i].correct) / len(stim_df[stim_df[task] == i])])
+                    d_per_diff = d_per_diff.append({'run': this_run,
+                                                    'task':task,
+                                                    'difficulty':i,
+                                                    'hit_rate': hit_rate,
+                                                    'fa_rate': fp/(fp + tn)}, ignore_index=True)
+                    large_AF_corr.append([i, hit_rate])
             elif task == 'fix_intensity':
                 if i != 0:
-                    small_AF_corr.append(
-                        [i, sum(stim_df[stim_df[task] == i].correct) / len(stim_df[stim_df[task] == i])])
+                    d_per_diff = d_per_diff.append({'run': this_run,
+                                                    'task': task,
+                                                    'difficulty': i,
+                                                    'hit_rate': hit_rate,
+                                                    'fa_rate': fp / (fp + tn)}, ignore_index=True)
+                    small_AF_corr.append([i, hit_rate])
 
-    return psychophysics, large_AF_corr, small_AF_corr
+    return psychophysics, d_per_diff, large_AF_corr, small_AF_corr
