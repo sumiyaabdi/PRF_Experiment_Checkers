@@ -15,7 +15,6 @@ import os
 opj = os.path.join
 
 
-
 class PRFTrial(Trial):
 
     def __init__(self, session, trial_nr, bar_orientation, bar_position_in_ori,
@@ -161,5 +160,6 @@ class PRFTrial(Trial):
                  if key != self.session.mri_trigger:
                      self.last_resp = key
                      self.last_resp_onset = t
-        
-    
+
+class PsychophysTrial(PRFTrial):
+    pass

@@ -24,21 +24,11 @@ from utils import create_stim_list
 opj = os.path.join
 
 
+class PRFSession(Session):
 
-class PRFSession(PylinkEyetrackerSession):
-
-    def __init__(self, output_str, output_dir, settings_file,eyetracker_on=True):
-
-        """
-
-        Parameters
-        ----------
-        output_str
-        output_dir
-        settings_file
-        """
+    def __init__(self, output_str, output_dir, settings_file):
         
-        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file,eyetracker_on=eyetracker_on)
+        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
 
         self.color_range = self.settings['attn stim']['color_range']
         self.fix_range = self.settings['fixation stim']['gray_range']
@@ -237,4 +227,7 @@ class PRFSession(PylinkEyetrackerSession):
         self.close()
 
         
-
+class PsychophysSession(PRFSession):
+    pass
+    # def __init__(self,output_str, output_dir, settings_file):
+    #     super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
