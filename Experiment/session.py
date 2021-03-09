@@ -239,15 +239,15 @@ class PsychophysSession(PRFSession):
     def __init__(self,output_str, output_dir, settings_file):
         super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
 
-        self.color_range = self.settings['attn stim']['color_range']
-        self.fix_range = self.settings['fixation stim']['gray_range']
+        self.color_range = [0.2,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.8] # 11 values (10 + mid-point)
+        self.fix_range = [-0.1, -0.08, -0.06, -0.04, -0.02, 0, 0.02, 0.04, 0.06, 0.08, 0.1]
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
                         * len(np.where(self.bar_orientations != -1)[0]) \
                         + self.settings['PRF stimulus settings']['Blanks length'] \
                         * len(np.where(self.bar_orientations == -1)[0])
-        self.stim_per_trial = self.settings['attn stim']['stim_per_trial']
-        self.n_stim = self.n_trials
+        self.stim_per_trial = 1
+        self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
 
     def draw_attn_stimulus(self, phase):
