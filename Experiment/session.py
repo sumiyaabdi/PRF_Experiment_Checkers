@@ -41,6 +41,13 @@ class PRFSession(Session):
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
 
+        signal = self.n_stim / self.settings['attn stim']['signal']
+
+        self.color_balances = create_stim_list(self.n_stim, signal, self.color_range,
+                                               self.settings['attn stim']['default_balance'])
+        self.fix_colors = create_stim_list(self.n_stim, signal, self.fix_range,
+                                           self.settings['fixation stim']['default_color'])
+
         if self.settings['operating system'] == 'mac':  # to compensate for macbook retina display
             self.screen = np.array([self.win.size[0], self.win.size[1]]) / 2
         else:
@@ -156,17 +163,6 @@ class PRFSession(Session):
         #random bar direction at each step. could also make this time-based
         self.bar_direction_at_TR = np.round(np.random.rand(self.n_trials))
 
-
-        ### attn trial details ###
-        signal = self.n_stim / self.settings['attn stim']['signal']
-
-        self.color_balances = create_stim_list(self.n_stim, signal, self.color_range, self.settings['attn stim']['default_balance'])
-        self.fix_colors = create_stim_list(self.n_stim, signal, self.fix_range, self.settings['fixation stim']['default_color'])
-
-        print(f'color_balances: {self.color_balances} \nLEN color balances:{len(self.color_balances)}')
-        # print(f'n.stim: {self.n_stim}')
-
-
         # trial list
         for i in range(self.n_trials):
             if self.settings['psychophysics'] == True:
@@ -249,6 +245,9 @@ class PsychophysSession(PRFSession):
         self.stim_per_trial = 1
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
+
+        self.color_balances = np.random.choice(self.color_range,self.n_stim)
+        self.fix_colors = np.random.choice(self.fix_range,self.n_stim)
 
     def draw_attn_stimulus(self, phase):
         self.stim_nr = self.current_trial.trial_nr

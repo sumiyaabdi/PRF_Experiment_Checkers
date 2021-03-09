@@ -149,26 +149,25 @@ class PRFTrial(Trial):
                         event_type = 'response'
                         self.session.total_responses += 1
 
+                idx = self.session.global_log.shape[0]
+                self.session.global_log.loc[idx, 'trial_nr'] = self.trial_nr
+                self.session.global_log.loc[idx, 'onset'] = t
+                self.session.global_log.loc[idx, 'event_type'] = event_type
+                self.session.global_log.loc[idx, 'phase'] = self.phase
+                self.session.global_log.loc[idx, 'response'] = key
+                self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[int(self.trial_nr * self.session.stim_per_trial + (self.phase-1)/2)]
+                self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[int(self.trial_nr * self.session.stim_per_trial + (self.phase-1)/2)]
 
-                    idx = self.session.global_log.shape[0]
-                    self.session.global_log.loc[idx, 'trial_nr'] = self.trial_nr
-                    self.session.global_log.loc[idx, 'onset'] = t
-                    self.session.global_log.loc[idx, 'event_type'] = event_type
-                    self.session.global_log.loc[idx, 'phase'] = self.phase
-                    self.session.global_log.loc[idx, 'response'] = key
-                    self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[int(self.trial_nr * self.session.stim_per_trial + (self.phase-1)/2)]
-                    self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[int(self.trial_nr * self.session.stim_per_trial + (self.phase-1)/2)]
+                for param, val in self.parameters.items():
+                    self.session.global_log.loc[idx, param] = val
 
-                    for param, val in self.parameters.items():
-                        self.session.global_log.loc[idx, param] = val
+                 #self.trial_log['response_key'][self.phase].append(key)
+                 #self.trial_log['response_onset'][self.phase].append(t)
+                 #self.trial_log['response_time'][self.phase].append(t - self.start_trial)
 
-                     #self.trial_log['response_key'][self.phase].append(key)
-                     #self.trial_log['response_onset'][self.phase].append(t)
-                     #self.trial_log['response_time'][self.phase].append(t - self.start_trial)
-
-                    if key != self.session.mri_trigger:
-                        self.last_resp = key
-                        self.last_resp_onset = t
+                if key != self.session.mri_trigger:
+                    self.last_resp = key
+                    self.last_resp_onset = t
 
 class PsychophysTrial(PRFTrial):
     pass

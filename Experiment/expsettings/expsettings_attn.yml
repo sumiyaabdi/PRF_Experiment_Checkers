@@ -39,6 +39,10 @@ mri:
     sound: False  # simulate scanner noise
 
 psychophysics: True
+#    task: True
+#    color_range:
+#    fix_range:
+
 
 attn stim:
     number of sections: 1
