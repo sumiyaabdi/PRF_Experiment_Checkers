@@ -16,7 +16,7 @@ from psychopy import visual, tools
 from psychopy.visual import filters
 
 from exptools2.core.session import Session
-from trial import PRFTrial
+from trial import PRFTrial, PsychophysTrial
 from stim import PRFStim, AttSizeStim, FixationStim, cross_fixation
 from utils import create_stim_list
 
@@ -169,13 +169,20 @@ class PRFSession(Session):
 
         # trial list
         for i in range(self.n_trials):
-            self.trials.append(PRFTrial(session=self,
-                                        trial_nr=i,
-
-                                        bar_orientation=self.bar_orientation_at_TR[i],
-                                        bar_position_in_ori=self.bar_pos_in_ori[i],
-                                        bar_direction=self.bar_direction_at_TR[i]
-                                        ))
+            if self.settings['psychophysics'] == True:
+                self.trials.append(PsychophysTrial(session=self,
+                                                    trial_nr=i,
+                                                    bar_orientation=self.bar_orientation_at_TR[i],
+                                                    bar_position_in_ori=self.bar_pos_in_ori[i],
+                                                    bar_direction=self.bar_direction_at_TR[i]
+                                                    ))
+            else:
+                self.trials.append(PRFTrial(session=self,
+                                            trial_nr=i,
+                                            bar_orientation=self.bar_orientation_at_TR[i],
+                                            bar_position_in_ori=self.bar_pos_in_ori[i],
+                                            bar_direction=self.bar_direction_at_TR[i]
+                                            ))
 
         # times for dot color change. continue the task into the topup
         self.total_time = self.n_trials * self.bar_step_length

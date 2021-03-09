@@ -239,6 +239,7 @@ class PRFStim(object):
     def draw(self, time, pos_in_ori, orientation,  bar_direction):
         
         # calculate position of the bar in relation to its orientation
+        print(f'orientation: {orientation}')
         x_pos, y_pos = np.cos((2.0*np.pi)*-orientation/360.0)*pos_in_ori, np.sin((2.0*np.pi)*-orientation/360.0)*pos_in_ori
         
         # convert current time to sine/cosine to decide which texture to draw
@@ -312,8 +313,3 @@ class PRFStim(object):
                 self.checkerboard_1.setPos([x_pos, y_pos])
                 self.checkerboard_1.setOri(orientation)
                 self.checkerboard_1.draw()            
-            
-
-
-
-
