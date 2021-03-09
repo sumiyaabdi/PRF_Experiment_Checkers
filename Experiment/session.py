@@ -163,7 +163,7 @@ class PRFSession(Session):
         self.color_balances = create_stim_list(self.n_stim, signal, self.color_range, self.settings['attn stim']['default_balance'])
         self.fix_colors = create_stim_list(self.n_stim, signal, self.fix_range, self.settings['fixation stim']['default_color'])
 
-        # print(f'color_balances: {self.color_balances} \nLEN color balances:{len(self.color_balances)}')
+        print(f'color_balances: {self.color_balances} \nLEN color balances:{len(self.color_balances)}')
         # print(f'n.stim: {self.n_stim}')
 
 
@@ -235,6 +235,23 @@ class PRFSession(Session):
 
         
 class PsychophysSession(PRFSession):
-    pass
-    # def __init__(self,output_str, output_dir, settings_file):
-    #     super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+
+    def __init__(self,output_str, output_dir, settings_file):
+        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+
+        self.color_range = self.settings['attn stim']['color_range']
+        self.fix_range = self.settings['fixation stim']['gray_range']
+        self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
+        self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
+                        * len(np.where(self.bar_orientations != -1)[0]) \
+                        + self.settings['PRF stimulus settings']['Blanks length'] \
+                        * len(np.where(self.bar_orientations == -1)[0])
+        self.stim_per_trial = self.settings['attn stim']['stim_per_trial']
+        self.n_stim = self.n_trials
+        self.trials = []
+
+    def draw_attn_stimulus(self, phase):
+        self.stim_nr = self.current_trial.trial_nr
+        self.largeAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
+        self.smallAF.draw(self.fix_colors[self.stim_nr],
+                          radius=self.settings['fixation stim'].get('radius'))

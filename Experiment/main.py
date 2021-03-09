@@ -7,7 +7,7 @@ Created on Mon Feb 25 14:04:44 2019
 """
 import sys
 import os
-from session import PRFSession
+from session import PRFSession,PsychophysSession
 from datetime import datetime
 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -31,7 +31,7 @@ def main():
     settings_file='expsettings/expsettings_'+task+'.yml'
     # settings_file = 'expsettings/expsettings_attn.yml'
 
-    ts = PRFSession(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+    ts = PsychophysSession(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
     ts.create_stimuli()
     ts.create_trials()
     ts.run()
