@@ -39,7 +39,7 @@ def d_prime(hits, misses, fas, crs):
     return d_prime, c
 
 
-def load_data(f_names):
+def load_data(f_names, psychophys=False):
     """
     Loads data in logs folder unless run is passed as an excluded run.
     Automatically excludes 0 runs.
@@ -54,13 +54,13 @@ def load_data(f_names):
 
     for f in f_names:
         # skip 0 and exclude trials
-        if f.split('/')[1].split('_')[3] == '0':
+        if f.split('/')[-2].split('_')[3] == '0':
             continue
 
         df = pd.read_table(f, keep_default_na=True)
 
         # drop ISI rows
-        df = df.drop(df[(df.phase % 2 == 0) & (df.event_type == 'stim')].index)
+        df = df.drop(df[(df.phase % 2 == 1) & (df.event_type == 'stim')].index)
 
         # change NaNs to 0
         df['duration'] = df['duration'].fillna(0)
@@ -71,9 +71,9 @@ def load_data(f_names):
         df['end_abs'] = df.onset_abs + df.duration
 
         # add column for task and color
-        df['task'] = f.split('/')[1].split('_')[-1]
-        df['color'] = f.split('/')[1].split('_')[-2]
-        df['run'] = f.split('/')[1].split('_')[3]
+        df['task'] = f.split('/')[-2].split('_')[-1]
+#         df['color'] = f.split('/')[-2].split('_')[-2]
+        df['run'] = f.split('/')[-2].split('_')[3]
 
         all_logs = all_logs.append(df, ignore_index=True)
 

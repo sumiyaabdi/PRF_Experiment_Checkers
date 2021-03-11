@@ -4,14 +4,14 @@ preferences:
         units: deg
 
 window:
-    size: [1920, 1080] # [1440, 900]
+    size: [1440, 900] # [1920, 1080] #
     pos: [0, 0]
     color: [0, 0, 0]
     fullscr: False
     winType: pyglet
     waitBlanking: True
 
-operating system: linux
+operating system: mac
 
 monitor:
     name: default
@@ -38,7 +38,7 @@ mri:
     skip: 0  # how many frames to silently omit initially during T1 stabilization, no sync pulse.
     sound: False  # simulate scanner noise
 
-psychophysics: True
+psychophysics: False
 #    task: True
 #    color_range:
 #    fix_range:
@@ -52,8 +52,8 @@ attn stim:
     color1: [0.5, 0.5, 0.5] # [1,-1,1] # [-0.8, 0.18, 1] # 
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] # 
     default_balance: 0.5
-    color_range: [0.15, 0.25,0.75, 0.85]
-    stim_per_trial: 2
+    color_range: [0.1, 0.2]
+    stim_per_trial: 1
     signal: 2
 
 fixation stim:
@@ -69,7 +69,7 @@ sound:
     play_times: [3, 20, 45, 72, 108, 129]
 
 PRF stimulus settings:
-    Scanner sync: True                # set this to true to make bar move on input 't'
+    Scanner sync: False                # set this to true to make bar move on input 't'
     Screenshot: True
     Squares in bar: 2
     Bar pass steps: 20                # number of steps the bar takes to traverse the aperture
@@ -79,7 +79,3 @@ PRF stimulus settings:
     Checkers motion speed: 3          # checkers motion speed. direction is randomly up/down at each bar step
     Size fixation dot in degrees: 0.05 # dot changes color on average every two TRs (or bar steps)
     Bar step length: 1.5                # in seconds. this is only used if Scanner sync is set to False
-
-
-
-
