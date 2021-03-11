@@ -76,9 +76,10 @@ class AttSizeStim():
             if not ring_nr in section_positions:
                 ring_condition = np.floor(n_sections * ring_nr / total_rings)
                 for pa in np.linspace(0, 2 * np.pi, cpr, endpoint=False):
+                    jitters = np.linspace(0,0.2,10)
                     x, y = tools.coordinatetools.pol2cart(pa, ecc, units=None)
-                    element_array_np.append([x,
-                                             y,
+                    element_array_np.append([x+np.random.choice(jitters),
+                                             y+np.random.choice(jitters),
                                              ecc,
                                              pa,
                                              s,
@@ -86,6 +87,8 @@ class AttSizeStim():
             ring_nr += 1
 
             self.element_array_np = np.array(element_array_np)
+            x_diff = np.linspace(0, np.mean(np.diff(self.element_array_np[:, 0])) / 2, 5)
+            # print(f'x: {np.diff(self.element_array_np[:, 0])}\n', f'y: {np.diff(self.element_array_np[:, 1])}')
 
             self.element_array_stim = visual.ElementArrayStim(self.session.win,
                                                               colors=self.element_array_np[:, [5, 6, 7]],
