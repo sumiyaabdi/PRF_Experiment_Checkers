@@ -18,7 +18,7 @@ from psychopy.visual import filters
 from exptools2.core.session import Session
 from trial import PRFTrial, PsychophysTrial
 from stim import PRFStim, AttSizeStim, FixationStim, cross_fixation
-from utils import create_stim_list
+from utils import create_stim_list, get_stim_nr
 
 
 opj = os.path.join
@@ -45,6 +45,7 @@ class PRFSession(Session):
 
         self.color_balances = create_stim_list(self.n_stim, signal, self.color_range,
                                                self.settings['attn stim']['default_balance'])
+        print(f'self.color_balances: {self.color_balances}')
         self.fix_colors = create_stim_list(self.n_stim, signal, self.fix_range,
                                            self.settings['fixation stim']['default_color'])
 
@@ -165,7 +166,7 @@ class PRFSession(Session):
 
         # trial list
         for i in range(self.n_trials):
-            if self.settings['psychophysics'] == True:
+            if self.settings['psychophysics']['task'] == True:
                 self.trials.append(PsychophysTrial(session=self,
                                                     trial_nr=i,
                                                     bar_orientation=self.bar_orientation_at_TR[i],
@@ -201,7 +202,7 @@ class PRFSession(Session):
                                bar_direction=self.current_trial.bar_direction)
 
     def draw_attn_stimulus(self, phase):
-        self.stim_nr = self.current_trial.trial_nr * self.stim_per_trial + int((phase-1)/2)
+        self.stim_nr = get_stim_nr(self.current_trial.trial_nr,phase,self.stim_per_trial)
         self.largeAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
         self.smallAF.draw(self.fix_colors[self.stim_nr],
                           radius=self.settings['fixation stim'].get('radius'))
@@ -235,7 +236,7 @@ class PsychophysSession(PRFSession):
     def __init__(self,output_str, output_dir, settings_file):
         super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
 
-        self.color_range = [0.2,0.3,0.35,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.8] # 11 values (10 + mid-point)
+        self.color_range = [0.1,0.9] # 11 values (10 + mid-point)
         self.fix_range = [-0.8, -0.6, -0.4, -0.2, -0.1, 0, 0.1, 0.2, 0.4, 0.6, 0.8]
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
@@ -247,7 +248,10 @@ class PsychophysSession(PRFSession):
         self.trials = []
 
         self.color_balances = np.random.choice(self.color_range,self.n_stim)
+        # print(f'self.color_balances: {self.color_balances}')
         self.fix_colors = np.random.choice(self.fix_range,self.n_stim)
+
+        # print(f'self.settings["psychophysics"]["task"]: {self.settings["psychophysics"]["task"]}')
 
     def draw_attn_stimulus(self, phase):
         self.stim_nr = self.current_trial.trial_nr

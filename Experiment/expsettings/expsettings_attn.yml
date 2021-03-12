@@ -38,11 +38,11 @@ mri:
     skip: 0  # how many frames to silently omit initially during T1 stabilization, no sync pulse.
     sound: False  # simulate scanner noise
 
-psychophysics: False
-#    task: True
+psychophysics:
+    task: False
+    bar: True
 #    color_range:
 #    fix_range:
-
 
 attn stim:
     number of sections: 1
@@ -53,7 +53,7 @@ attn stim:
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] # 
     default_balance: 0.5
     color_range: [0.1, 0.2]
-    stim_per_trial: 1
+    stim_per_trial: 2
     signal: 2
 
 fixation stim:

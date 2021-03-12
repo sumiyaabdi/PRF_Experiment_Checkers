@@ -7,7 +7,7 @@ Created on Mon Feb 25 14:04:44 2019
 """
 import sys
 import os
-from session import PRFSession,PsychophysSession
+from session import PRFSession
 from datetime import datetime
 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 

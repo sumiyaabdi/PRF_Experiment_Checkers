@@ -1,5 +1,8 @@
 import numpy as np
 
+def get_stim_nr(trial,phase,stim_per_trial):
+    phase = phase-1 if phase % 2 == 1 else phase
+    return int(trial * stim_per_trial + (phase)/2)
 
 def create_stim_list(n, signal, values,midpoint):
     """
