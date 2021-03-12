@@ -181,8 +181,8 @@ class PsychophysTrial(Trial):
     def draw(self, *args, **kwargs):
         # draw bar stimulus and circular (raised cosine) aperture from Session class
         """ Draws stimuli """
-        self.session.draw_prf_stimulus()
-        self.session.mask_stim.draw()
+        # self.session.draw_prf_stimulus()
+        # self.session.mask_stim.draw()
 
         # uncomment below to draw diagonal fixation lines
         self.session.line1.draw()
