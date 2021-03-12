@@ -174,7 +174,7 @@ class PsychophysTrial(Trial):
         self.bar_orientation = bar_orientation
         self.bar_position_in_ori = bar_position_in_ori
         self.bar_direction = bar_direction
-        phase_durations = [100] # [self.session.settings['mri']['TR']/4]*2
+        phase_durations = [self.session.settings['mri']['TR']/4,100]
 
         super().__init__(session, trial_nr, phase_durations, *args, **kwargs)
 
@@ -194,7 +194,7 @@ class PsychophysTrial(Trial):
     def get_events(self):
         """ Logs responses/triggers """
         events = event.getKeys(timeStamped=self.session.clock)
-        waitKeys = event.waitKeys(keyList=['left','right'])
+        # waitKeys = event.waitKeys(keyList=['left','right'], timeStamped=self.session.clock)
         if events:
             if 'q' in [ev[0] for ev in events]:  # specific key in settings?
 
