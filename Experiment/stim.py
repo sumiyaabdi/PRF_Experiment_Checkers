@@ -25,7 +25,7 @@ class FixationStim():
         self.color = [color]*3 # turns into RGB array
         self.radius = radius
         if outline:
-            self.stim = visual.Circle(self.session.win, lineColor='black',
+            self.stim = visual.Circle(self.session.win, lineColor=self.session.settings['fixation stim']['line_color'],
                                       lineWidth=self.session.settings['fixation stim']['line_width'],
                                       contrast=self.session.settings['fixation stim']['contrast'],
                                       radius=radius, fillColor=self.color, edges=100)
