@@ -4,14 +4,13 @@ preferences:
         units: deg
 
 window:
-    size: [1440, 900] # [1920, 1080] #
-    pos: [0, 0]
+    size: [1920, 1080] #[1440, 900] # 
     color: [0, 0, 0]
-    fullscr: False
+    fullscr: True
     winType: pyglet
     waitBlanking: True
 
-operating system: mac
+operating system: linux
 
 monitor:
     name: default
@@ -57,7 +56,7 @@ attn stim:
     signal: 2
 
 fixation stim:
-  line_color: black
+  line_color: red
   line_width: 1
 
   contrast: 0.15
