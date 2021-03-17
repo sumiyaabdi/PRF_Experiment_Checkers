@@ -58,7 +58,7 @@ attn stim:
 
 fixation stim:
   line_color: red
-  line_width: 2.5
+  line_width: 5
 
   contrast: 0.2
   radius: 0.1
