@@ -41,8 +41,13 @@ mri:
 psychophysics:
     task: True
     bar: False
-    color_range: [0.1, 0.15, 0.2, 0.3, 0.4 ,0.5, 0.6, 0.7, 0.8, 0.85,0.9]
-    fix_range: [-0.6,-0.4,-0.3,-0.2,-0.1, 0, 0.1, 0.2,0.3, 0.4, 0.6]
+    large_range: [0.1, 0.15, 0.2, 0.3, 0.4 ,0.5, 0.6, 0.7, 0.8, 0.85,0.9]
+    small_range: [0.1, 0.15, 0.2, 0.3, 0.4 ,0.5, 0.6, 0.7, 0.8, 0.85,0.9]
+
+
+attn_task:
+  stim_per_trial: 2
+  signal: 2
 
 large_task:
     n_sections: 1
@@ -53,12 +58,10 @@ large_task:
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] #
     default_balance: 0.5
     color_range: [0.1, 0.2]
-    stim_per_trial: 2
-    signal: 2
 
 small_task:
     n_sections: 1
-    n_rings: 3
+    n_rings: 5
     row_spacing: 2
     opacity: 0.15
     radius: 0.1
@@ -66,8 +69,6 @@ small_task:
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] #
     default_balance: 0.5
     color_range: [0.1, 0.2]
-    stim_per_trial: 2
-    signal: 2
 
 fixation stim:
   line_color: red

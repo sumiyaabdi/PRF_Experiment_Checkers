@@ -30,24 +30,25 @@ class PRFSession(Session):
 
         super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
 
-        self.color_range = self.settings['large_task']['color_range']
-        self.fix_range = self.settings['fixation stim']['gray_range']
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
                         * len(np.where(self.bar_orientations != -1)[0]) \
                         + self.settings['PRF stimulus settings']['Blanks length'] \
                         * len(np.where(self.bar_orientations == -1)[0])
-        self.stim_per_trial = self.settings['large_task']['stim_per_trial']
+        self.stim_per_trial = self.settings['attn_task']['stim_per_trial']
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
 
-        signal = self.n_stim / self.settings['large_task']['signal']
+        signal = self.n_stim / self.settings['attn_task']['signal']
 
-        self.color_balances = create_stim_list(self.n_stim, signal, self.color_range,
+        self.large_balances = create_stim_list(self.n_stim, signal, self.settings['large_task']['color_range'],
                                                self.settings['large_task']['default_balance'])
-        print(f'self.color_balances: {self.color_balances}')
-        self.fix_colors = create_stim_list(self.n_stim, signal, self.fix_range,
-                                           self.settings['fixation stim']['default_color'])
+
+        self.small_balances = create_stim_list(self.n_stim, signal, self.settings['small_task']['color_range'],
+                                               self.settings['large_task']['default_balance'])
+
+        print(f'self.large_balances: {self.large_balances},\nself.small_balances: {self.small_balances}')
+
 
         if self.settings['operating system'] == 'mac':  # to compensate for macbook retina display
             self.screen = np.array([self.win.size[0], self.win.size[1]]) / 2
@@ -58,13 +59,13 @@ class PRFSession(Session):
         #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
         if self.settings['mri']['topup_scan']==True:
             self.topup_scan_duration=self.settings['mri']['topup_duration']
-        
+
         if self.settings['PRF stimulus settings']['Scanner sync']==True:
             self.bar_step_length = self.settings['mri']['TR']
             self.mri_trigger='t'
         else:
             self.bar_step_length = self.settings['PRF stimulus settings']['Bar step length']
-            
+
         if self.settings['PRF stimulus settings']['Screenshot']==True:
             self.screen_dir=output_dir+'/'+output_str+'_Screenshots'
             if not os.path.exists(self.screen_dir):
@@ -216,11 +217,8 @@ class PRFSession(Session):
     def draw_attn_stimulus(self, phase):
         self.stim_nr = get_stim_nr(self.current_trial.trial_nr,phase,self.stim_per_trial)
         self.fix_circle.draw(0, radius=self.settings['small_task'].get('radius'))
-        self.largeAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
-        self.smallAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
-        # self.smallAF.draw(self.fix_colors[self.stim_nr],
-        #                   radius=self.settings['fixation stim'].get('radius'))
-  
+        self.largeAF.draw(self.large_balances[self.stim_nr], self.stim_nr)
+        self.smallAF.draw(self.small_balances[self.stim_nr], self.stim_nr)
 
 
     def run(self):
@@ -250,25 +248,23 @@ class PsychophysSession(PRFSession):
     def __init__(self,output_str, output_dir, settings_file):
         super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
 
-        self.color_range = self.settings['psychophysics']['color_range']
-        self.fix_range = self.settings['psychophysics']['fix_range']
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
                         * len(np.where(self.bar_orientations != -1)[0]) \
                         + self.settings['PRF stimulus settings']['Blanks length'] \
                         * len(np.where(self.bar_orientations == -1)[0])
+
         self.stim_per_trial = 1
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
 
-        self.color_balances = np.random.choice(self.color_range,self.n_stim)
-        # print(f'self.color_balances: {self.color_balances}')
-        self.fix_colors = np.random.choice(self.fix_range,self.n_stim)
+        self.large_range = self.settings['psychophysics']['large_range']
+        self.small_range = self.settings['psychophysics']['small_range']
+        self.large_balances = np.random.choice(self.large_range,self.n_stim)
+        self.small_balances = np.random.choice(self.small_range, self.n_stim)
 
-        # print(f'self.settings["psychophysics"]["task"]: {self.settings["psychophysics"]["task"]}')
-
-    def draw_attn_stimulus(self, phase):
+    def draw_attn_stimulus(self):
         self.stim_nr = self.current_trial.trial_nr
-        self.largeAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
-        self.smallAF.draw(self.fix_colors[self.stim_nr],
-                          radius=self.settings['fixation stim'].get('radius'))
+        self.fix_circle.draw(0, radius=self.settings['small_task'].get('radius'))
+        self.largeAF.draw(self.large_balances[self.stim_nr], self.stim_nr)
+        self.smallAF.draw(self.small_balances[self.stim_nr], self.stim_nr)

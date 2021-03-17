@@ -60,6 +60,7 @@ class AttSizeStim():
         total_rings = self.n_sections * (n_rings + 1) + 1
 
         # eccentricities for each ring of dots in degrees
+
         if ecc_min != 0:
             ring_eccs = np.linspace(ecc_min, ecc_max, total_rings, endpoint=True)
         else:
@@ -124,9 +125,11 @@ class AttSizeStim():
 
 
     def draw(self, color_balance, stim_nr):
+        print(f'color_balance: {color_balance}')
         this_ring_bool = self.element_array_np[:, -1] == 0
         nr_elements_in_condition = this_ring_bool.sum()
         nr_signal_elements = int(nr_elements_in_condition * color_balance)
+        print(f'nr_signal_elements: {nr_signal_elements}\nself.color1: {self.color1}')
         ordered_signals = np.r_[np.ones((nr_signal_elements, 3)) * self.color1,
                                 np.ones((nr_elements_in_condition - nr_signal_elements, 3)) * self.color2]
         ordered_signals = ordered_signals[self.color_orders][stim_nr, :]
