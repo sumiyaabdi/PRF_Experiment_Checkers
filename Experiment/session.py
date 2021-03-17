@@ -215,6 +215,7 @@ class PRFSession(Session):
 
     def draw_attn_stimulus(self, phase):
         self.stim_nr = get_stim_nr(self.current_trial.trial_nr,phase,self.stim_per_trial)
+        self.fix_circle.draw(0, radius=self.settings['small_task'].get('radius'))
         self.largeAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
         self.smallAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
         # self.smallAF.draw(self.fix_colors[self.stim_nr],

@@ -59,8 +59,8 @@ class PRFTrial(Trial):
         if self.phase % 2 == 0:
             self.session.draw_attn_stimulus(phase=self.phase)
 
-        if self.phase % 2 == 1 and self.session.settings['psychophysics']['task'] == True:
-            self.session.smallAF.draw(0, radius=self.session.settings['fixation stim'].get('radius'))
+        if self.phase % 2 == 1:
+            self.session.fix_circle.draw(0, radius=self.session.settings['small_task'].get('radius'))
 
         
     def log_phase_info(self, phase=None):
