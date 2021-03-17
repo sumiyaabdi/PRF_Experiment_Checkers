@@ -27,24 +27,24 @@ opj = os.path.join
 class PRFSession(Session):
 
     def __init__(self, output_str, output_dir, settings_file):
-        
+
         super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
 
-        self.color_range = self.settings['attn stim']['color_range']
+        self.color_range = self.settings['large_task']['color_range']
         self.fix_range = self.settings['fixation stim']['gray_range']
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
                         * len(np.where(self.bar_orientations != -1)[0]) \
                         + self.settings['PRF stimulus settings']['Blanks length'] \
                         * len(np.where(self.bar_orientations == -1)[0])
-        self.stim_per_trial = self.settings['attn stim']['stim_per_trial']
+        self.stim_per_trial = self.settings['large_task']['stim_per_trial']
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
 
-        signal = self.n_stim / self.settings['attn stim']['signal']
+        signal = self.n_stim / self.settings['large_task']['signal']
 
         self.color_balances = create_stim_list(self.n_stim, signal, self.color_range,
-                                               self.settings['attn stim']['default_balance'])
+                                               self.settings['large_task']['default_balance'])
         print(f'self.color_balances: {self.color_balances}')
         self.fix_colors = create_stim_list(self.n_stim, signal, self.fix_range,
                                            self.settings['fixation stim']['default_color'])
@@ -104,14 +104,26 @@ class PRFSession(Session):
         
 
         self.largeAF = AttSizeStim(self,
-                                   n_sections=self.settings['attn stim']['number of sections'],
-                                   ecc_min=self.settings['fixation stim']['radius'] + 0.2,
+                                   n_sections=self.settings['large_task']['n_sections'],
+                                   ecc_min=self.settings['small_task']['radius'] + 0.3,
                                    ecc_max= tools.monitorunittools.pix2deg(self.screen[1],self.monitor)/2 + 0.5, # radius
-                                   n_rings=self.settings['attn stim']['number of rings'],
-                                   row_spacing_factor=self.settings['attn stim']['row spacing factor'],
-                                   opacity=self.settings['attn stim']['opacity'])
+                                   n_rings=self.settings['large_task']['n_rings'],
+                                   row_spacing_factor=self.settings['large_task']['row_spacing'],
+                                   opacity=self.settings['large_task']['opacity'],
+                                   color1=self.settings['large_task']['color1'],
+                                   color2=self.settings['large_task']['color2'])
 
-        self.smallAF = FixationStim(self)
+        self.smallAF = AttSizeStim(self,
+                                   n_sections=self.settings['small_task']['n_sections'],
+                                   ecc_min=0,
+                                   ecc_max=self.settings['small_task']['radius'],
+                                   n_rings=self.settings['small_task']['n_rings'],
+                                   row_spacing_factor=self.settings['small_task']['row_spacing'],
+                                   opacity=self.settings['small_task']['opacity'],
+                                   color1=self.settings['small_task']['color1'],
+                                   color2=self.settings['small_task']['color2'])
+
+        self.fix_circle = FixationStim(self)
         self.cross_fix = cross_fixation(self.win, 0.2, (-1, -1, -1), opacity=0.5)
 
         # create fixation lines
@@ -204,8 +216,9 @@ class PRFSession(Session):
     def draw_attn_stimulus(self, phase):
         self.stim_nr = get_stim_nr(self.current_trial.trial_nr,phase,self.stim_per_trial)
         self.largeAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
-        self.smallAF.draw(self.fix_colors[self.stim_nr],
-                          radius=self.settings['fixation stim'].get('radius'))
+        self.smallAF.draw(self.color_balances[self.stim_nr], self.stim_nr)
+        # self.smallAF.draw(self.fix_colors[self.stim_nr],
+        #                   radius=self.settings['fixation stim'].get('radius'))
   
 
 

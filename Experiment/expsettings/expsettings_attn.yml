@@ -43,10 +43,10 @@ psychophysics:
 #    color_range:
 #    fix_range:
 
-attn stim:
-    number of sections: 1
-    number of rings: 15
-    row spacing factor: 1
+large_task:
+    n_sections: 1
+    n_rings: 15
+    row_spacing: 1
     opacity: 0.15
     color1: [0.5, 0.5, 0.5] # [1,-1,1] # [-0.8, 0.18, 1] # 
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] # 
@@ -55,17 +55,25 @@ attn stim:
     stim_per_trial: 2
     signal: 2
 
+small_task:
+    n_sections: 1
+    n_rings: 3
+    row_spacing: 2
+    opacity: 0.15
+    radius: 0.1
+    color1: [ 0.1, 0.1, 0.1 ] # [1,-1,1] # [-0.8, 0.18, 1] #
+    color2: [-0.1, -0.1, -0.1] # [-1,-0.32,0.12] # [1, -0.3, 0.7] #
+    default_balance: 0.5
+    color_range: [0.1, 0.2]
+    stim_per_trial: 2
+    signal: 2
+
 fixation stim:
   line_color: red
   line_width: 1
-
   contrast: 0.15
-  radius: 0.1
   default_color: 0
   gray_range: [-0.5, -0.9, 0.8, 0.5]
-
-sound:
-    play_times: [3, 20, 45, 72, 108, 129]
 
 PRF stimulus settings:
     Scanner sync: False                # set this to true to make bar move on input 't'

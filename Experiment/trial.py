@@ -191,7 +191,7 @@ class PsychophysTrial(Trial):
         if self.phase % 2 == 0:
             self.session.draw_attn_stimulus(phase=self.phase)
         elif self.phase % 2 == 1:
-            self.session.smallAF.draw(0, radius=self.session.settings['fixation stim'].get('radius'))
+            self.session.fix_circle.draw(0, radius=self.session.settings['fixation stim'].get('radius'))
 
     def get_events(self):
         """ Logs responses/triggers """
