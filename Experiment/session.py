@@ -47,8 +47,6 @@ class PRFSession(Session):
         self.small_balances = create_stim_list(self.n_stim, signal, self.settings['small_task']['color_range'],
                                                self.settings['large_task']['default_balance'])
 
-        print(f'self.large_balances: {self.large_balances},\nself.small_balances: {self.small_balances}')
-
 
         if self.settings['operating system'] == 'mac':  # to compensate for macbook retina display
             self.screen = np.array([self.win.size[0], self.win.size[1]]) / 2
@@ -112,7 +110,8 @@ class PRFSession(Session):
                                    row_spacing_factor=self.settings['large_task']['row_spacing'],
                                    opacity=self.settings['large_task']['opacity'],
                                    color1=self.settings['large_task']['color1'],
-                                   color2=self.settings['large_task']['color2'])
+                                   color2=self.settings['large_task']['color2'],
+                                   jitter=True)
 
         self.smallAF = AttSizeStim(self,
                                    n_sections=self.settings['small_task']['n_sections'],

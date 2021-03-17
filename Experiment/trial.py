@@ -61,8 +61,6 @@ class PRFTrial(Trial):
 
         if self.phase % 2 == 1:
             self.session.fix_circle.draw(0, radius=self.session.settings['small_task']['radius'])
-            print(f"circle radius: {self.session.settings['small_task']['radius']}")
-
         
     def log_phase_info(self, phase=None):
         """ Method passed to win.callonFlip, such that the
