@@ -60,13 +60,8 @@ class PRFTrial(Trial):
             self.session.draw_attn_stimulus(phase=self.phase)
 
         if self.phase % 2 == 1:
-<<<<<<< HEAD
-            self.session.smallAF.draw(0, radius=self.session.settings['fixation stim'].get('radius'))
-
-=======
             self.session.fix_circle.draw(0, radius=self.session.settings['small_task']['radius'])
->>>>>>> smallAF
-        
+
     def log_phase_info(self, phase=None):
         """ Method passed to win.callonFlip, such that the
         onsets get logged *exactly* on the screen flip.
