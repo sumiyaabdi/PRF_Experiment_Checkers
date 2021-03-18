@@ -18,7 +18,7 @@ from psychopy.visual import filters
 from exptools2.core.session import Session
 from trial import PRFTrial, PsychophysTrial
 from stim import PRFStim, AttSizeStim, FixationStim, cross_fixation
-from utils import create_stim_list, get_stim_nr
+from utils import create_stim_list, get_stim_nr,psyc_stim_list
 
 
 opj = os.path.join
@@ -257,10 +257,19 @@ class PsychophysSession(PRFSession):
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
 
-        self.large_range = self.settings['psychophysics']['large_range']
-        self.small_range = self.settings['psychophysics']['small_range']
-        self.large_balances = np.random.choice(self.large_range,self.n_stim)
-        self.small_balances = np.random.choice(self.small_range, self.n_stim)
+        # large_range = self.settings['psychophysics']['large_range']
+        # small_range = self.settings['psychophysics']['small_range']
+
+        self.large_balances = psyc_stim_list(self.settings['psychophysics']['large_range'], 
+                                            self.n_stim, self.settings['large_task']['default_balance'])
+        
+        self.small_balances = psyc_stim_list(self.settings['psychophysics']['small_range'], 
+                                            self.n_stim, self.settings['small_task']['default_balance'])
+
+        print(f'large_balances: {self.large_balances}')
+
+        # self.large_balances = np.random.choice(self.large_range,self.n_stim)
+        # self.small_balances = np.random.choice(self.small_range, self.n_stim)
 
     def draw_attn_stimulus(self):
         self.stim_nr = self.current_trial.trial_nr

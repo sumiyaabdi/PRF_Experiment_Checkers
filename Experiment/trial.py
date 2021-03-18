@@ -173,7 +173,7 @@ class PsychophysTrial(Trial):
         self.bar_orientation = bar_orientation
         self.bar_position_in_ori = bar_position_in_ori
         self.bar_direction = bar_direction
-        phase_durations = [self.session.settings['mri']['TR']/4,100]
+        phase_durations = [self.session.settings['mri']['TR']/4,100,0.3]
 
         super().__init__(session, trial_nr, phase_durations, *args, **kwargs)
 
@@ -187,9 +187,11 @@ class PsychophysTrial(Trial):
         self.session.line1.draw()
         self.session.line2.draw()
 
-        if self.phase % 2 == 0:
+        if self.phase == 0:
             self.session.draw_attn_stimulus()
-        elif self.phase % 2 == 1:
+        elif self.phase == 1:
+            self.session.fix_circle.draw(0, radius=self.session.settings['small_task'].get('radius'))
+        elif self.phase == 2:
             self.session.fix_circle.draw(0, radius=self.session.settings['small_task'].get('radius'))
 
     def get_events(self):
