@@ -75,7 +75,6 @@ fixation stim:
   line_width: 1.25
   contrast: 0.5
   default_color: 0
-  gray_range: [-0.5, -0.9, 0.8, 0.5]
 
 PRF stimulus settings:
     Scanner sync: False                # set this to true to make bar move on input 't'
