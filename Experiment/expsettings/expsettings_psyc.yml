@@ -47,7 +47,7 @@ psychophysics:
 
 attn_task:
   stim_per_trial: 2
-  signal: 2
+  signal: 6
 
 large_task:
     n_sections: 1
