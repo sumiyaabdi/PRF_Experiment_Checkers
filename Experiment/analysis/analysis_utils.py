@@ -71,7 +71,7 @@ def load_data(f_names, psychophys=False):
         df['end_abs'] = df.onset_abs + df.duration
 
         # add column for task and color
-        df['task'] = f.split('/')[-2].split('_')[-1]
+        df['task'] = f.split('/')[-2].split('_')[-2]
 #         df['color'] = f.split('/')[-2].split('_')[-2]
         df['run'] = f.split('/')[-2].split('_')[3]
 
@@ -95,12 +95,12 @@ def analyse_logs(all_logs, duration=1):
         this_run = str(this_run)
         df = all_logs[all_logs['run'] == this_run]
 
-        if df.task.iloc[0] == 'largeAF':
+        if df.task.iloc[0] == 'l':
             task = 'color_balance'
             baseline = 0.5
-        elif df.task.iloc[0] == 'smallAF':
+        elif df.task.iloc[0] == 's':
             task = 'fix_intensity'
-            baseline = 0
+            baseline = 0.5
 
         stim_df = df[df.event_type == 'stim']
         switch_loc = np.diff(stim_df[task], prepend=baseline) != 0
@@ -167,7 +167,7 @@ def analyse_logs(all_logs, duration=1):
                                                     'fa_rate': fp/(fp + tn)}, ignore_index=True)
                     large_AF_corr.append([i, hit_rate])
             elif task == 'fix_intensity':
-                if i != 0:
+                if i != 0.5:
                     d_per_diff = d_per_diff.append({'run': this_run,
                                                     'task': task,
                                                     'difficulty': i,

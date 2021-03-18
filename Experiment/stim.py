@@ -44,19 +44,23 @@ class AttSizeStim():
                  n_rings,
                  row_spacing_factor,
                  opacity,
+                 color1,
+                 color2,
                  draw_ring=False,
+                 jitter=False,
                  **kwargs):
 
         self.session = session
         self.n_sections = n_sections
         self.opacity = opacity
         self.draw_ring = draw_ring
-        self.color1 = self.session.settings['attn stim']['color1']
-        self.color2 = self.session.settings['attn stim']['color2']
+        self.color1 = color1
+        self.color2 = color2
 
         total_rings = self.n_sections * (n_rings + 1) + 1
 
         # eccentricities for each ring of dots in degrees
+
         if ecc_min != 0:
             ring_eccs = np.linspace(ecc_min, ecc_max, total_rings, endpoint=True)
         else:
@@ -78,12 +82,21 @@ class AttSizeStim():
                 for pa in np.linspace(0, 2 * np.pi, cpr, endpoint=False):
                     jitters = np.linspace(0,0.2,10)
                     x, y = tools.coordinatetools.pol2cart(pa, ecc, units=None)
-                    element_array_np.append([x+np.random.choice(jitters),
+                    if jitter:
+                        element_array_np.append([x+np.random.choice(jitters),
                                              y+np.random.choice(jitters),
                                              ecc,
                                              pa,
                                              s,
                                              1, 1, 1, 0.2, ring_nr, ring_condition])
+                    else:
+                        element_array_np.append([x,
+                                                 y,
+                                                 ecc,
+                                                 pa,
+                                                 s,
+                                                 1, 1, 1, 0.2, ring_nr, ring_condition])
+
             ring_nr += 1
 
             self.element_array_np = np.array(element_array_np)

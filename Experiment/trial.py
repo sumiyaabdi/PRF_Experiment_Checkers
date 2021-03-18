@@ -60,8 +60,12 @@ class PRFTrial(Trial):
             self.session.draw_attn_stimulus(phase=self.phase)
 
         if self.phase % 2 == 1:
+<<<<<<< HEAD
             self.session.smallAF.draw(0, radius=self.session.settings['fixation stim'].get('radius'))
 
+=======
+            self.session.fix_circle.draw(0, radius=self.session.settings['small_task']['radius'])
+>>>>>>> smallAF
         
     def log_phase_info(self, phase=None):
         """ Method passed to win.callonFlip, such that the
@@ -96,8 +100,8 @@ class PRFTrial(Trial):
         idx = self.session.global_log.shape[0]
         self.session.global_log.loc[idx, 'onset'] = onset
         self.session.global_log.loc[idx, 'trial_nr'] = self.trial_nr
-        self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
-        self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
+        self.session.global_log.loc[idx, 'large_prop'] = self.session.large_balances[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
+        self.session.global_log.loc[idx, 'small_prop'] = self.session.small_balances[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
         self.session.global_log.loc[idx, 'event_type'] = self.phase_names[phase]
         self.session.global_log.loc[idx, 'phase'] = phase
         self.session.global_log.loc[idx, 'nr_frames'] = self.session.nr_frames
@@ -152,8 +156,8 @@ class PRFTrial(Trial):
                 self.session.global_log.loc[idx, 'event_type'] = event_type
                 self.session.global_log.loc[idx, 'phase'] = self.phase
                 self.session.global_log.loc[idx, 'response'] = key
-                self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
-                self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
+                self.session.global_log.loc[idx, 'large_prop'] = self.session.large_balances[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
+                self.session.global_log.loc[idx, 'small_prop'] = self.session.small_balances[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
 
                 for param, val in self.parameters.items():
                     self.session.global_log.loc[idx, param] = val
@@ -174,7 +178,7 @@ class PsychophysTrial(Trial):
         self.bar_orientation = bar_orientation
         self.bar_position_in_ori = bar_position_in_ori
         self.bar_direction = bar_direction
-        phase_durations = [self.session.settings['mri']['TR']/4,100]
+        phase_durations = [self.session.settings['mri']['TR']/4,100,0.3]
 
         super().__init__(session, trial_nr, phase_durations, *args, **kwargs)
 
@@ -188,10 +192,12 @@ class PsychophysTrial(Trial):
         self.session.line1.draw()
         self.session.line2.draw()
 
-        if self.phase % 2 == 0:
-            self.session.draw_attn_stimulus(phase=self.phase)
-        elif self.phase % 2 == 1:
-            self.session.smallAF.draw(0, radius=self.session.settings['fixation stim'].get('radius'))
+        if self.phase == 0:
+            self.session.draw_attn_stimulus()
+        elif self.phase == 1:
+            self.session.fix_circle.draw(0, radius=self.session.settings['small_task'].get('radius'))
+        elif self.phase == 2:
+            self.session.fix_circle.draw(0, radius=self.session.settings['small_task'].get('radius'))
 
     def get_events(self):
         """ Logs responses/triggers """
@@ -230,17 +236,11 @@ class PsychophysTrial(Trial):
                 self.session.global_log.loc[idx, 'event_type'] = event_type
                 self.session.global_log.loc[idx, 'phase'] = self.phase
                 self.session.global_log.loc[idx, 'response'] = key
-                self.session.global_log.loc[idx, 'color_balance'] = self.session.color_balances[
-                    int(self.trial_nr * self.session.stim_per_trial + (self.phase - 1) / 2)]
-                self.session.global_log.loc[idx, 'fix_intensity'] = self.session.fix_colors[
-                    int(self.trial_nr * self.session.stim_per_trial + (self.phase - 1) / 2)]
+                self.session.global_log.loc[idx, 'large_prop'] = self.session.large_balances[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
+                self.session.global_log.loc[idx, 'small_prop'] = self.session.small_balances[get_stim_nr(self.trial_nr, self.phase, self.session.stim_per_trial)]
 
                 for param, val in self.parameters.items():
                     self.session.global_log.loc[idx, param] = val
-
-                # self.trial_log['response_key'][self.phase].append(key)
-                # self.trial_log['response_onset'][self.phase].append(t)
-                # self.trial_log['response_time'][self.phase].append(t - self.start_trial)
 
                 if key != self.session.mri_trigger:
                     self.last_resp = key
