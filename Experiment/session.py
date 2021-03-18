@@ -223,7 +223,10 @@ class PRFSession(Session):
     def run(self):
         """run the session"""
         # cycle through trials
-        self.display_text('Waiting for scanner', keys=self.settings['mri'].get('sync', 't'))
+        self.line1.draw()
+        self.line2.draw()
+        self.fix_circle.draw(0, radius=self.settings['small_task'].get('radius'))
+        self.display_text('', keys=self.settings['mri'].get('sync', 't'))
 
         self.start_experiment()
         
@@ -266,10 +269,6 @@ class PsychophysSession(PRFSession):
         self.small_balances = psyc_stim_list(self.settings['psychophysics']['small_range'], 
                                             self.n_stim, self.settings['small_task']['default_balance'])
 
-        print(f'large_balances: {self.large_balances}')
-
-        # self.large_balances = np.random.choice(self.large_range,self.n_stim)
-        # self.small_balances = np.random.choice(self.small_range, self.n_stim)
 
     def draw_attn_stimulus(self):
         self.stim_nr = self.current_trial.trial_nr
