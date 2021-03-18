@@ -45,7 +45,7 @@ psychophysics:
 
 attn_task:
   stim_per_trial: 2
-  signal: 2
+  signal: 5
 
 large_task:
     n_sections: 1
@@ -55,7 +55,7 @@ large_task:
     color1: [0.5, 0.5, 0.5] # [1,-1,1] # [-0.8, 0.18, 1] # 
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] # 
     default_balance: 0.5
-    color_range: [0.1, 0.2]
+    color_range: [0.33, 0.61]
 
 small_task:
     n_sections: 1
@@ -66,7 +66,7 @@ small_task:
     color1: [0.5, 0.5, 0.5] # [1,-1,1] # [-0.8, 0.18, 1] #
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] #
     default_balance: 0.5
-    color_range: [0.1, 0.2]
+    color_range: [0.26, 0.68]
 
 fixation stim:
   line_color: red

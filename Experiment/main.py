@@ -19,8 +19,12 @@ def main():
     task = sys.argv[3]
     #in the full experiment we would do 3 runs
     run = sys.argv[4]
+
+    attn = ''
+    while attn not in ('s','small','l','large'):
+        attn = input('Which attention task (small/large)?: ')
     
-    output_str= subject+'_'+sess+'_'+task+'_'+run
+    output_str= subject+'_'+sess+'_'+task+'_'+run+'_'+attn
     
     output_dir = './logs/'+output_str+'_Logs'
     

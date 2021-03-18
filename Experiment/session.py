@@ -18,7 +18,7 @@ from psychopy.visual import filters
 from exptools2.core.session import Session
 from trial import PRFTrial, PsychophysTrial
 from stim import PRFStim, AttSizeStim, FixationStim, cross_fixation
-from utils import create_stim_list, get_stim_nr
+from utils import create_stim_list, get_stim_nr,psyc_stim_list
 
 
 opj = os.path.join
@@ -46,8 +46,6 @@ class PRFSession(Session):
 
         self.small_balances = create_stim_list(self.n_stim, signal, self.settings['small_task']['color_range'],
                                                self.settings['large_task']['default_balance'])
-
-        print(f'self.large_balances: {self.large_balances},\nself.small_balances: {self.small_balances}')
 
 
         if self.settings['operating system'] == 'mac':  # to compensate for macbook retina display
@@ -112,7 +110,8 @@ class PRFSession(Session):
                                    row_spacing_factor=self.settings['large_task']['row_spacing'],
                                    opacity=self.settings['large_task']['opacity'],
                                    color1=self.settings['large_task']['color1'],
-                                   color2=self.settings['large_task']['color2'])
+                                   color2=self.settings['large_task']['color2'],
+                                   jitter=True)
 
         self.smallAF = AttSizeStim(self,
                                    n_sections=self.settings['small_task']['n_sections'],
@@ -258,10 +257,19 @@ class PsychophysSession(PRFSession):
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
 
-        self.large_range = self.settings['psychophysics']['large_range']
-        self.small_range = self.settings['psychophysics']['small_range']
-        self.large_balances = np.random.choice(self.large_range,self.n_stim)
-        self.small_balances = np.random.choice(self.small_range, self.n_stim)
+        # large_range = self.settings['psychophysics']['large_range']
+        # small_range = self.settings['psychophysics']['small_range']
+
+        self.large_balances = psyc_stim_list(self.settings['psychophysics']['large_range'], 
+                                            self.n_stim, self.settings['large_task']['default_balance'])
+        
+        self.small_balances = psyc_stim_list(self.settings['psychophysics']['small_range'], 
+                                            self.n_stim, self.settings['small_task']['default_balance'])
+
+        print(f'large_balances: {self.large_balances}')
+
+        # self.large_balances = np.random.choice(self.large_range,self.n_stim)
+        # self.small_balances = np.random.choice(self.small_range, self.n_stim)
 
     def draw_attn_stimulus(self):
         self.stim_nr = self.current_trial.trial_nr
