@@ -23,6 +23,10 @@ def main():
     attn = ''
     while attn not in ('s','small','l','large'):
         attn = input('Which attention task (small/large)?: ')
+
+    eyetrack = ''
+    while eyetrack not in ('y','yes','n','no'):
+        eyetrack = input('Eyetracking (y/n)?: ')
     
     output_str= subject+'_'+sess+'_'+task+'_'+run+'_'+attn
     
@@ -33,9 +37,16 @@ def main():
         output_dir = output_dir + datetime.now().strftime('%Y%m%d%H%M%S')
     
     settings_file='expsettings/expsettings_'+task+'.yml'
-    # settings_file = 'expsettings/expsettings_attn.yml'
 
-    ts = PRFSession(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+    if (eyetrack == 'n') or (eyetrack == 'n'):
+        ts = PRFSession(output_str=output_str,
+                        output_dir=output_dir,
+                        settings_file=settings_file,
+                        eyetracker_on=False)
+    else:
+        ts = PRFSession(output_str=output_str,
+                        output_dir=output_dir,
+                        settings_file=settings_file)
     ts.create_stimuli()
     ts.create_trials()
     ts.run()

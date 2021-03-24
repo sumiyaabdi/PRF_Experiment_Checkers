@@ -26,7 +26,7 @@ opj = os.path.join
 
 class PRFSession(PylinkEyetrackerSession):
 
-    def __init__(self, output_str, output_dir, settings_file, eyetracker_on = True):
+    def __init__(self, output_str, output_dir, settings_file, eyetracker_on=True):
 
         super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file, eyetracker_on = eyetracker_on)
 
@@ -256,8 +256,8 @@ class PRFSession(PylinkEyetrackerSession):
         
 class PsychophysSession(PRFSession):
 
-    def __init__(self,output_str, output_dir, settings_file):
-        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+    def __init__(self,output_str, output_dir, settings_file, eyetracker_on=True):
+        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file,eyetracker_on=eyetracker_on)
 
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
