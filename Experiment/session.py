@@ -15,7 +15,7 @@ sys.path.append('../../exptools2')
 from psychopy import visual, tools
 from psychopy.visual import filters
 
-from exptools2.core.session import Session
+from exptools2.core import Session, PylinkEyetrackerSession
 from trial import PRFTrial, PsychophysTrial
 from stim import PRFStim, AttSizeStim, FixationStim, cross_fixation
 from utils import create_stim_list, get_stim_nr,psyc_stim_list
@@ -24,11 +24,11 @@ from utils import create_stim_list, get_stim_nr,psyc_stim_list
 opj = os.path.join
 
 
-class PRFSession(Session):
+class PRFSession(PylinkEyetrackerSession):
 
-    def __init__(self, output_str, output_dir, settings_file):
+    def __init__(self, output_str, output_dir, settings_file, eyetracker_on = True):
 
-        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file, eyetracker_on = eyetracker_on)
 
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
@@ -223,12 +223,20 @@ class PRFSession(Session):
     def run(self):
         """run the session"""
         # cycle through trials
+
+        if self.eyetracker_on:
+            self.calibrate_eyetracker()
+
+
         self.line1.draw()
         self.line2.draw()
         self.fix_circle.draw(0, radius=self.settings['small_task'].get('radius'))
         self.display_text('', keys=self.settings['mri'].get('sync', 't'))
 
         self.start_experiment()
+
+        if self.eyetracker_on:
+            self.start_recording_eyetracker()
         
         for trial_idx in range(len(self.trials)):
             self.current_trial = self.trials[trial_idx]
