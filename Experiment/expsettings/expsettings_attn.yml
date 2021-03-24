@@ -55,7 +55,7 @@ large_task:
     color1: [0.3, 0.3, 0.3] # [1,-1,1] # [-0.8, 0.18, 1] #
     color2: [-0.3, -0.3, -0.3] # [-1,-0.32,0.12] # [1, -0.3, 0.7] #
     default_balance: 0.5
-    color_range: [0.33, 0.61]
+    color_range: [0.075, 0.925]
 
 small_task:
     n_sections: 1
@@ -66,12 +66,12 @@ small_task:
     color1: [0.5, 0.5, 0.5] # [1,-1,1] # [-0.8, 0.18, 1] #
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] #
     default_balance: 0.5
-    color_range: [0.26, 0.68]
+    color_range: [0.075, 0.925]
 
 fixation stim:
   line_color: red
-  line_width: 1.25
-  contrast: 0.5
+  line_width: 1.5
+  contrast: 0.75
   default_color: 0
 
 PRF stimulus settings:
@@ -85,3 +85,4 @@ PRF stimulus settings:
     Checkers motion speed: 3          # checkers motion speed. direction is randomly up/down at each bar step
     Size fixation dot in degrees: 0.05 # dot changes color on average every two TRs (or bar steps)
     Bar step length: 1.5                # in seconds. this is only used if Scanner sync is set to False
+    contrast: 0.5

@@ -151,13 +151,14 @@ class PRFStim(object):
                         bar_width_deg=1.25,
                         tex_nr_pix=2048,
                         flicker_frequency=6, 
-
+                        contrast=1,
                         **kwargs):
         self.session = session
         self.squares_in_bar = squares_in_bar
         self.bar_width_deg = bar_width_deg
         self.tex_nr_pix = tex_nr_pix
         self.flicker_frequency = flicker_frequency
+        self.contrast = contrast
 
         #calculate the bar width in pixels, with respect to the texture
         self.bar_width_in_pixels = tools.monitorunittools.deg2pix(bar_width_deg, self.session.monitor)*self.tex_nr_pix/self.session.win.size[1]
@@ -198,15 +199,18 @@ class PRFStim(object):
         self.checkerboard_1 = visual.GratingStim(self.session.win,
                                                  tex=self.sqr_tex,
                                                  units='pix',
-                                                 size=[self.session.win.size[1],self.session.win.size[1]])
+                                                 size=[self.session.win.size[1],self.session.win.size[1]],
+                                                 contrast=contrast)
         self.checkerboard_2 = visual.GratingStim(self.session.win,
                                                  tex=self.sqr_tex_phase_1,                                               
                                                  units='pix',
-                                                 size=[self.session.win.size[1],self.session.win.size[1]])
+                                                 size=[self.session.win.size[1],self.session.win.size[1]],
+                                                 contrast=contrast)
         self.checkerboard_3 = visual.GratingStim(self.session.win,
                                                  tex=self.sqr_tex_phase_2,                                                
                                                  units='pix',
-                                                 size=[self.session.win.size[1],self.session.win.size[1]])
+                                                 size=[self.session.win.size[1],self.session.win.size[1]],
+                                                 contrast=contrast)
         
         
         
@@ -215,38 +219,45 @@ class PRFStim(object):
             self.checkerboard_4 = visual.GratingStim(self.session.win,
                                                      tex=np.fliplr(self.sqr_tex_phase_1),
                                                      units='pix',
-                                                     size=[self.session.win.size[1],self.session.win.size[1]])
+                                                     size=[self.session.win.size[1],self.session.win.size[1]],
+                                                     contrast=contrast)
             self.checkerboard_8 = visual.GratingStim(self.session.win,
                                                      tex=-np.fliplr(self.sqr_tex_phase_1),
                                                      units='pix',
-                                                     size=[self.session.win.size[1],self.session.win.size[1]])
+                                                     size=[self.session.win.size[1],self.session.win.size[1]],
+                                                     contrast=contrast)
                 
         else:         
             self.checkerboard_4 = visual.GratingStim(self.session.win, 
                                                      tex=np.flipud(self.sqr_tex_phase_1),
                                                      units='pix',
-                                                     size=[self.session.win.size[1],self.session.win.size[1]])
+                                                     size=[self.session.win.size[1],self.session.win.size[1]],
+                                                     contrast=contrast)
             
             self.checkerboard_8 = visual.GratingStim(self.session.win,
                                                      tex=-np.flipud(self.sqr_tex_phase_1),
                                                      units='pix',
-                                                     size=[self.session.win.size[1],self.session.win.size[1]])
+                                                     size=[self.session.win.size[1],self.session.win.size[1]],
+                                                     contrast=contrast)
         
         #all other textures are the same
         self.checkerboard_5 = visual.GratingStim(self.session.win,
                                                  tex=-self.sqr_tex,
                                                  units='pix',
-                                                 size=[self.session.win.size[1],self.session.win.size[1]])
+                                                 size=[self.session.win.size[1],self.session.win.size[1]],
+                                                 contrast=contrast)
             
         self.checkerboard_6 = visual.GratingStim(self.session.win,
                                                  tex=-self.sqr_tex_phase_1,
                                                  units='pix',
-                                                 size=[self.session.win.size[1],self.session.win.size[1]])
+                                                 size=[self.session.win.size[1],self.session.win.size[1]],
+                                                 contrast=contrast)
             
         self.checkerboard_7 = visual.GratingStim(self.session.win,
                                                  tex=-self.sqr_tex_phase_2,
                                                  units='pix',
-                                                 size=[self.session.win.size[1],self.session.win.size[1]])
+                                                 size=[self.session.win.size[1],self.session.win.size[1]],
+                                                 contrast=contrast)
 
             
 

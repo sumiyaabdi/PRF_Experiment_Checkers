@@ -76,7 +76,8 @@ class PRFSession(PylinkEyetrackerSession):
         self.prf_stim = PRFStim(session=self, 
                         squares_in_bar=self.settings['PRF stimulus settings']['Squares in bar'], 
                         bar_width_deg=self.settings['PRF stimulus settings']['Bar width in degrees'],
-                        flicker_frequency=self.settings['PRF stimulus settings']['Checkers motion speed'])#self.deg2pix(self.settings['prf_max_eccentricity']))    
+                        flicker_frequency=self.settings['PRF stimulus settings']['Checkers motion speed'],
+                        contrast=self.settings['PRF stimulus settings']['contrast'])#self.deg2pix(self.settings['prf_max_eccentricity']))    
 
         if self.settings['operating system'] == 'mac':
             mask_size = [self.win.size[0]/2,self.win.size[1]/2]
