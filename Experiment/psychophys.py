@@ -22,7 +22,7 @@ def main():
 
     attn = ''
     while attn not in ('s','small','l','large'):
-        attn = input('Which attention task (small/large)?: ')
+        attn = input('Which attention task (s/l)?: ')
 
     output_str= subject+'_'+sess+'_'+task+'_'+run+'_'+attn
     
