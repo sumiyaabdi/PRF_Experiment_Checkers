@@ -104,10 +104,6 @@ class PRFTrial(Trial):
         for param, val in self.parameters.items():  # add parameters to log
             self.session.global_log.loc[idx, param] = val
 
-        # add to trial_log
-        # idx = self.trial_log.shape[0]
-        # self.trial_log.loc[idx, 'onset'][self.phase].append(onset)
-
         self.session.nr_frames = 0
 
     def get_events(self):
@@ -115,7 +111,6 @@ class PRFTrial(Trial):
          events = event.getKeys(timeStamped=self.session.clock)
          if events:
              if 'q' in [ev[0] for ev in events]:  # specific key in settings?
-
                  np.save(opj(self.session.output_dir, self.session.output_str+'_simple_response_data.npy'),
                          {'Total subject responses': self.session.total_responses})
                  
@@ -156,10 +151,6 @@ class PRFTrial(Trial):
 
                 for param, val in self.parameters.items():
                     self.session.global_log.loc[idx, param] = val
-
-                 #self.trial_log['response_key'][self.phase].append(key)
-                 #self.trial_log['response_onset'][self.phase].append(t)
-                 #self.trial_log['response_time'][self.phase].append(t - self.start_trial)
 
                 if key != self.session.mri_trigger:
                     self.last_resp = key

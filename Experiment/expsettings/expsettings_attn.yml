@@ -4,18 +4,19 @@ preferences:
         units: deg
 
 window:
-    size: [1920, 1080] #[1440, 900] # 
+    size: [1440, 900] #  [1920, 1080] #
+    pos: [0, 0]
     color: [0, 0, 0]
-    fullscr: True
+    fullscr: False
     winType: pyglet
     waitBlanking: True
 
-operating system: linux
+operating system: mac
 
 monitor:
     name: default
-    width: 69.8 # in cm, mac: 28.65
-    distance: 210  # in cm, mac: 53.854
+    width: 28.65 # 69.8 # in cm, mac:
+    distance:  53.854 # 210  # in cm, mac:
     gamma: 1
 
 mouse:
@@ -30,7 +31,7 @@ mri:
     topup_duration: 45 # topup scan duration in seconds (no 't's)
 
     #only relevant for scanning simulations
-    simulate: False #set this to true to simulate a virtual scanner   
+    simulate: False #set this to true to simulate a virtual scanner
     TA: 1.5  # seconds to acquire one volume
     volumes: 100  # number of 3D volumes to obtain in a given scanning run
     sync: t  # character used as flag for simulation sync timing, default=‘5’
@@ -40,8 +41,8 @@ mri:
 psychophysics:
     task: False
     bar: True
-#    color_range:
-#    fix_range:
+    large_range: [0.1, 0.15, 0.2, 0.3, 0.4 ,0.5, 0.6, 0.7, 0.8, 0.85,0.9]
+    small_range: [0.1, 0.15, 0.2, 0.3, 0.4 ,0.5, 0.6, 0.7, 0.8, 0.85,0.9]
 
 attn_task:
   stim_per_trial: 2
@@ -49,13 +50,13 @@ attn_task:
 
 large_task:
     n_sections: 1
-    n_rings: 15
+    n_rings: 25
     row_spacing: 1
     opacity: 0.15
-    color1: [0.3, 0.3, 0.3] # [1,-1,1] # [-0.8, 0.18, 1] #
-    color2: [-0.3, -0.3, -0.3] # [-1,-0.32,0.12] # [1, -0.3, 0.7] #
+    color1:  [-0.8, 0.18, 1] #[0.3, 0.3, 0.3] # [1,-1,1] #
+    color2:  [1, -0.3, 0.7] # [-0.3, -0.3, -0.3] #  [-1,-0.32,0.12] #
     default_balance: 0.5
-    color_range: [0.075, 0.925]
+    color_range: [0.1,0.9]
 
 small_task:
     n_sections: 1
@@ -66,7 +67,7 @@ small_task:
     color1: [0.5, 0.5, 0.5] # [1,-1,1] # [-0.8, 0.18, 1] #
     color2: [-0.5, -0.5, -0.5] # [-1,-0.32,0.12] # [1, -0.3, 0.7] #
     default_balance: 0.5
-    color_range: [0.075, 0.925]
+    color_range: [0.1,0.9]
 
 fixation stim:
   line_color: red
@@ -84,5 +85,5 @@ PRF stimulus settings:
     Bar width in degrees: 1.25
     Checkers motion speed: 3          # checkers motion speed. direction is randomly up/down at each bar step
     Size fixation dot in degrees: 0.05 # dot changes color on average every two TRs (or bar steps)
-    Bar step length: 1.5                # in seconds. this is only used if Scanner sync is set to False
+    Bar step length: 1.5            # in seconds. this is only used if Scanner sync is set to False
     contrast: 0.5

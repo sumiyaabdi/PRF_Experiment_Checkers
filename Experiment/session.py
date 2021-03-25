@@ -77,7 +77,7 @@ class PRFSession(PylinkEyetrackerSession):
                         squares_in_bar=self.settings['PRF stimulus settings']['Squares in bar'], 
                         bar_width_deg=self.settings['PRF stimulus settings']['Bar width in degrees'],
                         flicker_frequency=self.settings['PRF stimulus settings']['Checkers motion speed'],
-                        contrast=self.settings['PRF stimulus settings']['contrast'])#self.deg2pix(self.settings['prf_max_eccentricity']))    
+                        contrast=self.settings['PRF stimulus settings']['contrast'])
 
         if self.settings['operating system'] == 'mac':
             mask_size = [self.win.size[0]/2,self.win.size[1]/2]
@@ -106,7 +106,7 @@ class PRFSession(PylinkEyetrackerSession):
         self.largeAF = AttSizeStim(self,
                                    n_sections=self.settings['large_task']['n_sections'],
                                    ecc_min=self.settings['small_task']['radius'] + 0.3,
-                                   ecc_max= tools.monitorunittools.pix2deg(self.screen[1],self.monitor)/2 + 0.5, # radius
+                                   ecc_max= tools.monitorunittools.pix2deg(self.screen[0],self.monitor)/2 + 5.5, # radius
                                    n_rings=self.settings['large_task']['n_rings'],
                                    row_spacing_factor=self.settings['large_task']['row_spacing'],
                                    opacity=self.settings['large_task']['opacity'],
@@ -268,9 +268,6 @@ class PsychophysSession(PRFSession):
         self.stim_per_trial = 1
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
-
-        # large_range = self.settings['psychophysics']['large_range']
-        # small_range = self.settings['psychophysics']['small_range']
 
         self.large_balances = psyc_stim_list(self.settings['psychophysics']['large_range'], 
                                             self.n_stim, self.settings['large_task']['default_balance'])
