@@ -101,18 +101,17 @@ class PRFSession(PylinkEyetrackerSession):
                                         pos = np.array((0.0,0.0)), 
                                         color = [0,0,0])
 
-        
-
         self.largeAF = AttSizeStim(self,
                                    n_sections=self.settings['large_task']['n_sections'],
-                                   ecc_min=self.settings['small_task']['radius'] + 0.3,
-                                   ecc_max= tools.monitorunittools.pix2deg(self.screen[0],self.monitor)/2 + 5.5, # radius
+                                   ecc_min=self.settings['small_task']['radius']*3,
+                                   ecc_max= np.sqrt((tools.monitorunittools.pix2deg(self.screen[0],self.monitor)/2)**2 \
+                                            + (tools.monitorunittools.pix2deg(self.screen[0],self.monitor)/2)**2), # radius
                                    n_rings=self.settings['large_task']['n_rings'],
                                    row_spacing_factor=self.settings['large_task']['row_spacing'],
                                    opacity=self.settings['large_task']['opacity'],
                                    color1=self.settings['large_task']['color1'],
                                    color2=self.settings['large_task']['color2'],
-                                   jitter=True)
+                                   jitter=self.settings['large_task']['jitter'])
 
         self.smallAF = AttSizeStim(self,
                                    n_sections=self.settings['small_task']['n_sections'],
