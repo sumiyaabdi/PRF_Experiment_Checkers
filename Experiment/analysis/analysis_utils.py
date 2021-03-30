@@ -39,7 +39,7 @@ def d_prime(hits, misses, fas, crs):
     return d_prime, c
 
 
-def load_data(f_names, psychophys=False):
+def load_data(f_names, psychophys=False, drop_dupes=False):
     """
     Loads data in logs folder unless run is passed as an excluded run.
     Automatically excludes 0 runs.
@@ -76,6 +76,9 @@ def load_data(f_names, psychophys=False):
         df['run'] = f.split('/')[-2].split('_')[3]
 
         all_logs = all_logs.append(df, ignore_index=True)
+        
+#     if drop_dupes:
+#         all_logs.drop_duplicates(subset='trial_nr', inplace=True)
 
     return all_logs
 

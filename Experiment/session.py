@@ -15,7 +15,7 @@ sys.path.append('../../exptools2')
 from psychopy import visual, tools
 from psychopy.visual import filters
 
-from exptools2.core.session import Session
+from exptools2.core import Session, PylinkEyetrackerSession
 from trial import PRFTrial, PsychophysTrial
 from stim import PRFStim, AttSizeStim, FixationStim, cross_fixation
 from utils import create_stim_list, get_stim_nr,psyc_stim_list
@@ -24,11 +24,11 @@ from utils import create_stim_list, get_stim_nr,psyc_stim_list
 opj = os.path.join
 
 
-class PRFSession(Session):
+class PRFSession(PylinkEyetrackerSession):
 
-    def __init__(self, output_str, output_dir, settings_file):
+    def __init__(self, output_str, output_dir, settings_file, eyetracker_on=True):
 
-        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file, eyetracker_on = eyetracker_on)
 
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
@@ -76,7 +76,8 @@ class PRFSession(Session):
         self.prf_stim = PRFStim(session=self, 
                         squares_in_bar=self.settings['PRF stimulus settings']['Squares in bar'], 
                         bar_width_deg=self.settings['PRF stimulus settings']['Bar width in degrees'],
-                        flicker_frequency=self.settings['PRF stimulus settings']['Checkers motion speed'])#self.deg2pix(self.settings['prf_max_eccentricity']))    
+                        flicker_frequency=self.settings['PRF stimulus settings']['Checkers motion speed'],
+                        contrast=self.settings['PRF stimulus settings']['contrast'])
 
         if self.settings['operating system'] == 'mac':
             mask_size = [self.win.size[0]/2,self.win.size[1]/2]
@@ -100,18 +101,17 @@ class PRFSession(Session):
                                         pos = np.array((0.0,0.0)), 
                                         color = [0,0,0])
 
-        
-
         self.largeAF = AttSizeStim(self,
                                    n_sections=self.settings['large_task']['n_sections'],
-                                   ecc_min=self.settings['small_task']['radius'] + 0.3,
-                                   ecc_max= tools.monitorunittools.pix2deg(self.screen[1],self.monitor)/2 + 0.5, # radius
+                                   ecc_min=self.settings['small_task']['radius']*3,
+                                   ecc_max= np.sqrt((tools.monitorunittools.pix2deg(self.screen[0],self.monitor)/2)**2 \
+                                            + (tools.monitorunittools.pix2deg(self.screen[0],self.monitor)/2)**2), # radius
                                    n_rings=self.settings['large_task']['n_rings'],
                                    row_spacing_factor=self.settings['large_task']['row_spacing'],
                                    opacity=self.settings['large_task']['opacity'],
                                    color1=self.settings['large_task']['color1'],
                                    color2=self.settings['large_task']['color2'],
-                                   jitter=True)
+                                   jitter=self.settings['large_task']['jitter'])
 
         self.smallAF = AttSizeStim(self,
                                    n_sections=self.settings['small_task']['n_sections'],
@@ -223,12 +223,20 @@ class PRFSession(Session):
     def run(self):
         """run the session"""
         # cycle through trials
+
+        if self.eyetracker_on:
+            self.calibrate_eyetracker()
+
+
         self.line1.draw()
         self.line2.draw()
         self.fix_circle.draw(0, radius=self.settings['small_task'].get('radius'))
         self.display_text('', keys=self.settings['mri'].get('sync', 't'))
 
         self.start_experiment()
+
+        if self.eyetracker_on:
+            self.start_recording_eyetracker()
         
         for trial_idx in range(len(self.trials)):
             self.current_trial = self.trials[trial_idx]
@@ -247,8 +255,8 @@ class PRFSession(Session):
         
 class PsychophysSession(PRFSession):
 
-    def __init__(self,output_str, output_dir, settings_file):
-        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+    def __init__(self,output_str, output_dir, settings_file, eyetracker_on=True):
+        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file,eyetracker_on=eyetracker_on)
 
         self.bar_orientations = np.array(self.settings['PRF stimulus settings']['Bar orientations'])
         self.n_trials = 5 + self.settings['PRF stimulus settings']['Bar pass steps'] \
@@ -259,9 +267,6 @@ class PsychophysSession(PRFSession):
         self.stim_per_trial = 1
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
-
-        # large_range = self.settings['psychophysics']['large_range']
-        # small_range = self.settings['psychophysics']['small_range']
 
         self.large_balances = psyc_stim_list(self.settings['psychophysics']['large_range'], 
                                             self.n_stim, self.settings['large_task']['default_balance'])

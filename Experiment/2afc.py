@@ -7,7 +7,7 @@ Created on Mon Feb 25 14:04:44 2019
 """
 import sys
 import os
-from session import PRFSession, PsychophysSession
+from session import PsychophysSession
 from datetime import datetime
 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
@@ -31,45 +31,29 @@ def main():
     eyetrack = ''
     while eyetrack not in ('y','yes','n','no'):
         eyetrack = input('Eyetracking (y/n)?: ')
-    
+
     output_str= subject+'_ses-'+sess+'_task-'+task+attn.upper()+'_run-'+run
     print(f'Output folder: {output_str}')
-    
-    output_dir = './logs/'+output_str+'_Logs'
-    
+    output_dir = './logs/psychophys/'+output_str+'_Logs'
+
     if os.path.exists(output_dir):
         print("Warning: output directory already exists. Renaming to avoid overwriting.")
         output_dir = output_dir + datetime.now().strftime('%Y%m%d%H%M%S')
     
     settings_file='expsettings/expsettings_'+task+'.yml'
 
-    if task == 'yesno':
-        if (eyetrack == 'n') or (eyetrack == 'n'):
-            ts = PRFSession(output_str=output_str,
-                            output_dir=output_dir,
-                            settings_file=settings_file,
-                            eyetracker_on=False)
-        else:
-            ts = PRFSession(output_str=output_str,
-                            output_dir=output_dir,
-                            settings_file=settings_file)
-        ts.create_stimuli()
-        ts.create_trials()
-        ts.run()
-
-    elif task == '2afc':
-        if (eyetrack == 'n') or (eyetrack == 'n'):
-            ts = PsychophysSession(output_str=output_str,
-                                   output_dir=output_dir,
-                                   settings_file=settings_file,
-                                   eyetracker_on=False)
-        else:
-            ts = PsychophysSession(output_str=output_str,
-                                   output_dir=output_dir,
-                                   settings_file=settings_file)
-        ts.create_stimuli()
-        ts.create_trials()
-        ts.run()
+    if (eyetrack == 'n') or (eyetrack == 'n'):
+        ts = PsychophysSession(output_str=output_str,
+                               output_dir=output_dir,
+                               settings_file=settings_file,
+                               eyetracker_on=False)
+    else:
+        ts = PsychophysSession(output_str=output_str,
+                               output_dir=output_dir,
+                               settings_file=settings_file)
+    ts.create_stimuli()
+    ts.create_trials()
+    ts.run()
 
 if __name__ == '__main__':
     main()
