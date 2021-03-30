@@ -7,7 +7,7 @@ Created on Mon Feb 25 14:07:02 2019
 """
 import numpy as np
 from psychopy import visual, tools
-np.random.seed(2021)
+# np.random.seed(2021)
 
 def cross_fixation(win, size=0.1, color=(1,1,1), **kwargs):
     """ Creates a fixation cross with sensible defaults. """
@@ -82,8 +82,16 @@ class AttSizeStim():
                 for pa in np.linspace(0, 2 * np.pi, cpr, endpoint=False):
                     x, y = tools.coordinatetools.pol2cart(pa, ecc, units=None)
                     if jitter != None:
-                        jitter_list = np.linspace(0, jitter, 10)
-                        element_array_np.append([x+np.random.choice(jitter_list),
+                        jitter_list = np.linspace(-jitter, jitter, 10)
+                        if ecc == ring_eccs[0]:
+                            element_array_np.append([x+np.random.choice(jitter_list)/2,
+                                                y+np.random.choice(jitter_list),
+                                                ecc,
+                                                pa,
+                                                s,
+                                                1, 1, 1, 0.2, ring_nr, ring_condition])
+                        else:
+                            element_array_np.append([x+np.random.choice(jitter_list),
                                              y+np.random.choice(jitter_list),
                                              ecc,
                                              pa,

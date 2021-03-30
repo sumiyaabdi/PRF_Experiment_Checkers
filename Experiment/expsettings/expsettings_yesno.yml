@@ -33,7 +33,7 @@ mri:
     #only relevant for scanning simulations
     simulate: True #set this to true to simulate a virtual scanner
     TA: 1.5  # seconds to acquire one volume
-    volumes: 100  # number of 3D volumes to obtain in a given scanning run
+    volumes: 225  # number of 3D volumes to obtain in a given scanning run
     sync: t  # character used as flag for simulation sync timing, default=‘5’
     skip: 0  # how many frames to silently omit initially during T1 stabilization, no sync pulse.
     sound: False  # simulate scanner noise
@@ -52,19 +52,19 @@ large_task:
     n_sections: 1
     n_rings: 30
     row_spacing: 1
-    opacity: 0.15
-    color1:  [-0.8, 0.18, 1] #[0.3, 0.3, 0.3] # [1,-1,1] #
+    opacity: 0.25
+    color1: [-0.8, 0.18, 1] #[0.3, 0.3, 0.3] # [1,-1,1] #
     color2:  [1, -0.3, 0.7] # [-0.3, -0.3, -0.3] #  [-1,-0.32,0.12] #
     default_balance: 0.5
     color_range: [0.1,0.9]
-    jitter: 0.3
+    jitter: 0.15
     padding: 0 # degrees
 
 small_task:
     n_sections: 1
     n_rings: 5
     row_spacing: 2
-    opacity: 0.15
+    opacity: 0.75
     radius: 0.1
     color1:  [-0.8, 0.18, 1] #[0.3, 0.3, 0.3] # [1,-1,1] #
     color2:  [1, -0.3, 0.7] # [-0.3, -0.3, -0.3] #  [-1,-0.32,0.12] #
@@ -72,7 +72,7 @@ small_task:
     color_range: [0.1,0.9]
 
 fixation stim:
-  line_color: red
+  line_color: black
   line_width: 1.5
   contrast: 0.75
   default_color: 0
