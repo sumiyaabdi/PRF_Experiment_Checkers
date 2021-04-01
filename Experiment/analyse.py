@@ -81,7 +81,7 @@ class AnalyseRun():
         axs[1].set_xlabel('% Blue')
         axs[1].scatter(self.summary[self.summary.attn_size == 'l']['diff'],\
                        self.summary[self.summary.attn_size == 'l'].resp_left)
-        fig.savefig(f'./logs/{self.folder}_Logs/performance.png')
+        fig.savefig(f'./logs/{self.folder}_Logs/performance.png',dpi=300)
 
         # plot sigmoid and print 20% and 80% values
 
@@ -92,9 +92,8 @@ class AnalyseRun():
 
         val = (abs(0.5 - inv_sigmoid(.2, *popt)) + abs(0.5 - inv_sigmoid(.2, *popt))) / 2
 
-        print(f'20%: {inv_sigmoid(.2, *popt):.2f} \
-                        \n80%: {inv_sigmoid(.8, *popt):.2f} \
-                        \nYes/No Values: {0.5 + val:.3f} , {0.5 - val:.3f}')
+        print(f'\nSigmoid mid-point: {inv_sigmoid(.5, *popt):.3f}\
+                \nYes/No Values: {0.5 + val:.3f} , {0.5 - val:.3f}')
 
         x = np.linspace(0, 1, 20)
         y = sigmoid(x, *popt)
@@ -107,7 +106,7 @@ class AnalyseRun():
         ax.set_ylabel('Response Left')
         ax.set_xlabel('% Blue')
         plt.legend(loc='best')
-        fig2.savefig(f'./logs/{self.folder}_Logs/sigmoid.png')
+        fig2.savefig(f'./logs/{self.folder}_Logs/sigmoid.png',dpi=300)
 
         plt.show()
 
@@ -182,8 +181,3 @@ def d_prime(hits, misses, fas, crs):
     #     print(f'Hit rate: \t {hit_rate} \nFalse Alarm rate: {fa_rate}')
 
     return d_prime, c
-
-# f = 'sub-000_ses-0_task-2afcS_run-0_Logs'
-# task = '2afc'
-# attn = 's'
-
