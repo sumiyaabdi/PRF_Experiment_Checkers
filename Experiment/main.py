@@ -6,10 +6,12 @@ Created on Mon Feb 25 14:04:44 2019
 @author: marcoaqil
 """
 import sys
-import os
 from session import PRFSession, PsychophysSession
 from analyse import *
 from datetime import datetime
+
+
+
 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 def main():
@@ -41,7 +43,7 @@ def main():
     if os.path.exists(output_dir):
         print("Warning: output directory already exists. Renaming to avoid overwriting.")
         output_dir = output_dir + datetime.now().strftime('%Y%m%d%H%M%S')
-    
+
     settings_file='expsettings/expsettings_'+task+'.yml'
 
     if task == 'yesno':
@@ -71,57 +73,16 @@ def main():
         ts.create_stimuli()
         ts.create_trials()
         ts.run()
-    
+
     return output_str, task, attn
 
 
 if __name__ == '__main__':
     output_str, task, attn = main()
+    ts = AnalyseRun(output_str, task, attn)
 
     if task == '2afc':
-        df, summary = analyse2afc(output_str)
-
-        print(f'ATTENTION TASK IS: {df.attn_size.iloc[0]}')
-
-        # Plot performance for large and small tasks (check if participant is doing expected task)
-        fig, axs = plt.subplots(1,2, figsize=(12,4))
-        fig.suptitle(f'ATTENTION SIZE: {attn}', fontsize=16)
-
-        axs[0].set_title('SmallAF Performance')
-        axs[0].set_ylim(0,1)
-        axs[0].set_ylabel('Response Left')
-        axs[0].set_xlabel('% Blue')
-        axs[0].scatter(summary[summary.attn_size == 's']['diff'],summary[summary.attn_size == 's'].resp_left)
-
-        axs[1].set_title('LargeAF Performance')
-        axs[1].set_ylim(0,1)
-        axs[1].set_ylabel('Response Left')
-        axs[1].set_xlabel('% Blue')
-        axs[1].scatter(summary[summary.attn_size == 'l']['diff'],summary[summary.attn_size == 'l'].resp_left)
-
-        plt.show()
-
-        # plot sigmoid and print 20% and 80% values
-
-        xdata = summary[summary.attn_size == attn]['diff']
-        ydata = summary[summary.attn_size == attn].resp_left
-
-        popt, pcov = curve_fit(sigmoid, xdata, ydata)
-
-        val = (abs(0.5-inv_sigmoid(.2,*popt))+abs(0.5-inv_sigmoid(.2,*popt)))/2
-
-        print(f'20%: {inv_sigmoid(.2,*popt):.2f} \
-            \n80%: {inv_sigmoid(.8,*popt):.2f} \
-            \nYes/No Values: {0.5+val:.3f} , {0.5-val:.3f}')
-
-        x = np.linspace(0, 1, 20)
-        y = sigmoid(x, *popt)
-
-        plt.plot(xdata, ydata, 'o', label='data')
-        plt.title(f'{attn.upper()} AF')
-        plt.plot(x,y, label='sigmoid')
-        plt.ylim(0, 1)
-        plt.ylabel('Response Left')
-        plt.xlabel('% Blue')
-        plt.legend(loc='best')
-        plt.show()
+        ts.analyse2afc()
+        ts.plot2afc()
+    elif task == 'yesno':
+        ts.analyseYesNo()

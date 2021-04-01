@@ -45,7 +45,9 @@ class PRFTrial(Trial):
         #add topup time to last trial
         if self.session.settings['mri']['topup_scan']==True:
             if self.trial_nr == self.session.n_trials-1:
-                self.phase_durations=[self.session.topup_scan_duration]
+                self.phase_durations = [self.session.settings['PRF stimulus settings']['Bar step length'] \
+                                        / (self.session.stim_per_trial * 2)] * (self.session.stim_per_trial * 2 - 1)
+                self.phase_durations.append(self.session.topup_scan_duration)
 
     
     def draw(self, *args, **kwargs):
