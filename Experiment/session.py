@@ -245,7 +245,6 @@ class PRFSession(PylinkEyetrackerSession):
             self.current_trial = self.trials[trial_idx]
             self.current_trial_start_time = self.clock.getTime()
             print(f'TRIAL {trial_idx +1} onset: {self.current_trial_start_time:.3f}')
-            # print(f'self.n_trials - self.n_topup_trials: {self.n_trials - self.n_topup_trials}')
             self.current_trial.run()
         
         print('Total subject responses: %d'%self.total_responses)
@@ -254,7 +253,10 @@ class PRFSession(PylinkEyetrackerSession):
         
         if self.settings['PRF stimulus settings']['Screenshot']==True:
             self.win.saveMovieFrames(opj(self.screen_dir, self.output_str+'_Screenshot.png'))
-            
+        if self.current_trial ==  self.n_trials-1 and self.clock.getTime() > self.total_time:
+            self.close()
+            self.quit()
+
         self.close()
 
         

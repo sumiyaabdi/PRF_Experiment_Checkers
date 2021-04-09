@@ -114,32 +114,35 @@ class AnalyseRun():
     def analyseYesNo(self):
         print(self.wd)
         fname = f'{self.wd}/logs/{self.folder}_Logs/*.tsv'
-        sz = 'large_prop' if self.attn == 'l' else 'small_prop'
+        print(f'Attention Size: {self.attn.upper()}')
+        # sz = 'large_prop' if self.attn == 'l' else 'small_prop'
+        attn_sizes = ['large_prop', 'small_prop']
         baseline = 0.5
         duration = 1
 
-        df = pd.read_table(glob.glob(fname)[0], keep_default_na=True)
-        df = df.drop(
-            df[(df.phase % 2 == 1) & (df.event_type == 'stim')].index.append(df[df.event_type == 'pulse'].index))
-        df['duration'] = df['duration'].fillna(0)
-        df['nr_frames'] = df['nr_frames'].fillna(0)
-        df['end'] = df.onset + df.duration
-        df['end_abs'] = df.onset_abs + df.duration
+        for sz in attn_sizes:
+            df = pd.read_table(glob.glob(fname)[0], keep_default_na=True)
+            df = df.drop(
+                df[(df.phase % 2 == 1) & (df.event_type == 'stim')].index.append(df[df.event_type == 'pulse'].index))
+            df['duration'] = df['duration'].fillna(0)
+            df['nr_frames'] = df['nr_frames'].fillna(0)
+            df['end'] = df.onset + df.duration
+            df['end_abs'] = df.onset_abs + df.duration
 
-        stim_df = df[df.event_type == 'stim']
-        switch_loc = np.diff(stim_df[sz], prepend=baseline) != 0
-        switch_loc = stim_df[(switch_loc) & (stim_df[sz] != baseline)].index  # drop values where color_balance is 0.5
-        responses = df.loc[df.response == 'space']
+            stim_df = df[df.event_type == 'stim']
+            switch_loc = np.diff(stim_df[sz], prepend=baseline) != 0
+            switch_loc = stim_df[(switch_loc) & (stim_df[sz] != baseline)].index  # drop values where color_balance is 0.5
+            responses = df.loc[df.response == 'space']
 
-        tp = sum([(abs(i - responses.onset) < duration).any() \
-                  for i in stim_df.loc[switch_loc].end])  # true positives
-        fn = len(switch_loc) - tp  # false negatives (missed switches)
-        fp = len(responses) - tp  # false positives (responded with no switch)
-        tn = len(stim_df) - len(switch_loc) - fn  # true negative
+            tp = sum([(abs(i - responses.onset) < duration).any() \
+                      for i in stim_df.loc[switch_loc].end])  # true positives
+            fn = len(switch_loc) - tp  # false negatives (missed switches)
+            fp = len(responses) - tp  # false positives (responded with no switch)
+            tn = len(stim_df) - len(switch_loc) - fn  # true negative
 
-        d, c = d_prime(tp, fn, fp, tn)
+            d, c = d_prime(tp, fn, fp, tn)
 
-        print(f"D': {d:.3f}, C: {c:.3f}")
+            print(f"{sz.split('_')[0].upper()} D': {d:.3f}, C: {c:.3f}")
 
 def sigmoid(x,x0,k):
     y = np.array(1 / (1 + np.exp(-k*(x-x0))))
@@ -186,4 +189,5 @@ def d_prime(hits, misses, fas, crs):
 # f = 'sub-000_ses-0_task-2afcS_run-0_Logs'
 # task = '2afc'
 # attn = 's'
+
 
