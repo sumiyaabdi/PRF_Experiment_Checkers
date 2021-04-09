@@ -44,10 +44,10 @@ class PRFTrial(Trial):
 
         #add topup time to last trial
         if self.session.settings['mri']['topup_scan']==True:
-            if self.trial_nr == self.session.n_trials-1:
+
+            if self.trial_nr >= self.session.n_trials - self.session.n_topup_trials - 1:
                 self.phase_durations = [self.session.settings['PRF stimulus settings']['Bar step length'] \
-                                        / (self.session.stim_per_trial * 2)] * (self.session.stim_per_trial * 2 - 1)
-                self.phase_durations.append(self.session.topup_scan_duration)
+                                        / (self.session.stim_per_trial * 2)] * (self.session.stim_per_trial * 2)
 
     
     def draw(self, *args, **kwargs):
@@ -131,9 +131,11 @@ class PRFTrial(Trial):
                     self.exit_phase = True
 
                 elif self.session.settings['psychophysics']['task'] == False:
+
                     if key == self.session.mri_trigger:
                         event_type = 'pulse'
-                         #marco edit. the second bit is a hack to avoid double-counting of the first t when simulating a scanner
+                        #marco edit. the second bit is a hack to avoid double-counting of the first t when simulating a scanner
+                        # only exit final phase of trial with trigger, so trials are synced to TR
                         if self.session.settings['PRF stimulus settings']['Scanner sync']==True \
                                 and t>0.1 and self.phase == self.session.settings['attn_task']['stim_per_trial']*2-1:
                             self.exit_phase=True

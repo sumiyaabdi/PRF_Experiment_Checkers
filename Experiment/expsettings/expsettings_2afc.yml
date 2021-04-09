@@ -7,7 +7,7 @@ window:
     size: [1920, 1080] # [1440, 900] # 
     pos: [0, 0]
     color: [0, 0, 0]
-    fullscr: True
+    fullscr: False
     winType: pyglet
     waitBlanking: True
 
@@ -27,7 +27,7 @@ eyetracker:
 
 mri:
     TR: 1.5  # seconds between volume acquisitions
-    topup_scan: True
+    topup_scan: False
     topup_duration: 45 # topup scan duration in seconds (no 't's)
 
     #only relevant for scanning simulations

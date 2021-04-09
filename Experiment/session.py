@@ -35,6 +35,13 @@ class PRFSession(PylinkEyetrackerSession):
                         * len(np.where(self.bar_orientations != -1)[0]) \
                         + self.settings['PRF stimulus settings']['Blanks length'] \
                         * len(np.where(self.bar_orientations == -1)[0])
+
+        if self.settings['mri']['topup_scan']==True:
+            self.topup_scan_duration=self.settings['mri']['topup_duration']
+            self.n_topup_trials = int(self.topup_scan_duration / self.settings['mri']['TR'])
+            self.bar_orientations = np.append(self.bar_orientations, [-1,-1,-1])
+            self.n_trials = self.n_trials + self.n_topup_trials
+
         self.stim_per_trial = self.settings['attn_task']['stim_per_trial']
         self.n_stim = self.n_trials * self.stim_per_trial
         self.trials = []
@@ -52,11 +59,6 @@ class PRFSession(PylinkEyetrackerSession):
             self.screen = np.array([self.win.size[0], self.win.size[1]]) / 2
         else:
             self.screen = np.array([self.win.size[0], self.win.size[1]])
-
-
-        #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
-        if self.settings['mri']['topup_scan']==True:
-            self.topup_scan_duration=self.settings['mri']['topup_duration']
 
         if self.settings['PRF stimulus settings']['Scanner sync']==True:
             self.bar_step_length = self.settings['mri']['TR']
@@ -195,9 +197,10 @@ class PRFSession(PylinkEyetrackerSession):
 
         # times for dot color change. continue the task into the topup
         self.total_time = self.n_trials * self.bar_step_length
+        print(f'self.total_time: {self.total_time}')
 
-        if self.settings['mri']['topup_scan'] == True:
-            self.total_time += self.topup_scan_duration
+        # if self.settings['mri']['topup_scan'] == True:
+        #     self.total_time += self.topup_scan_duration
 
     def draw_prf_stimulus(self):
         #this timing is only used for the motion of checkerboards inside the bar. it does not have any effect on the actual bar motion
@@ -241,6 +244,8 @@ class PRFSession(PylinkEyetrackerSession):
         for trial_idx in range(len(self.trials)):
             self.current_trial = self.trials[trial_idx]
             self.current_trial_start_time = self.clock.getTime()
+            print(f'TRIAL {trial_idx +1} onset: {self.current_trial_start_time:.3f}')
+            # print(f'self.n_trials - self.n_topup_trials: {self.n_trials - self.n_topup_trials}')
             self.current_trial.run()
         
         print('Total subject responses: %d'%self.total_responses)
