@@ -23,7 +23,7 @@ def main():
     
     output_str= subject+'_'+sess+'_'+task+'_'+run
     
-    output_dir = './'+output_str+'_Logs'
+    output_dir = './logs/'+output_str+'_Logs'
     
     if os.path.exists(output_dir):
         print("Warning: output directory already exists. Renaming to avoid overwriting.")
