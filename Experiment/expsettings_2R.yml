@@ -25,11 +25,19 @@ mouse:
 
 eyetracker:
     model: eyelink
+    address: '100.1.1.1'
+    dot_size: 0.1
+    options:
+        active_eye: left
+        calibration_type: HV5
+        sample_rate: 1000
+        calibration_area_proportion: 0.4 0.4
+        validation_area_proportion: 0.4 0.4
 
 mri:
     TR: 1.5  # seconds between volume acquisitions
     topup_scan: True
-    topup_duration: 45 # topup scan duration in seconds (no 't's)
+    topup_duration: 5 # topup scan duration in seconds (no 't's)
 
     #only relevant for scanning simulations
     simulate: False #set this to true to simulate a virtual scanner   

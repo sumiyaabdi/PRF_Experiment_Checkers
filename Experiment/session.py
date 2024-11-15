@@ -12,7 +12,7 @@ from psychopy import visual
 from psychopy.visual import filters
 from psychopy import tools
 
-from exptools2.core.session import Session
+from exptools2.core import Session, PylinkEyetrackerSession
 from trial import PRFTrial
 from stim import PRFStim
 
@@ -20,13 +20,13 @@ opj = os.path.join
 
 
 
-class PRFSession(Session):
+class PRFSession(PylinkEyetrackerSession):
 
     
-    def __init__(self, output_str, output_dir, settings_file):
+    def __init__(self, output_str, output_dir,settings_file, eyetracker_on=True,):
         
         
-        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+        super().__init__(output_str=output_str, output_dir=output_dir, settings_file=settings_file,eyetracker_on=eyetracker_on)
         
         #if we are scanning, here I set the mri_trigger manually to the 't'. together with the change in trial.py, this ensures syncing
         if self.settings['mri']['topup_scan']==True:
@@ -235,9 +235,16 @@ class PRFSession(Session):
     def run(self):
         """run the session"""
         # cycle through trials
+
+        if self.eyetracker_on:
+            self.calibrate_eyetracker()
+            
         self.display_text('Waiting for scanner', keys=self.settings['mri'].get('sync', 't'))
 
         self.start_experiment()
+
+        if self.eyetracker_on:
+            self.start_recording_eyetracker()
         
         for trial_idx in range(len(self.trial_list)):
             self.current_trial = self.trial_list[trial_idx]

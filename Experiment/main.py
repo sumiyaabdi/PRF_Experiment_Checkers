@@ -12,6 +12,10 @@ from datetime import datetime
 datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
 def main():
+    """To run: python main.py sub ses task run
+        For example:
+            python main.py sub-000 ses-2 task-2R run-1
+    """
     subject = sys.argv[1]
     sess =  sys.argv[2]
     # 5 conditions: PRF2R, PRF1R, PRF1S, PRF4R, PRF4F 
@@ -31,7 +35,10 @@ def main():
     
     settings_file='./expsettings_'+task[5:]+'.yml'
 
-    ts = PRFSession(output_str=output_str, output_dir=output_dir, settings_file=settings_file)
+    ts = PRFSession(output_str=output_str, 
+                    output_dir=output_dir, 
+                    settings_file=settings_file,
+                    eyetracker_on=True)
     ts.run()
 
 if __name__ == '__main__':
